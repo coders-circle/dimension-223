@@ -1,6 +1,6 @@
 #pragma once
-#include <shaders/Material.h>
-#include <image/Texture.h>
+#include <graphics/Material.h>
+#include <graphics/Texture.h>
 
 inline std::vector<Shader*> GetDiffuseShaders()
 {

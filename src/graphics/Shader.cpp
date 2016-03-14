@@ -1,5 +1,5 @@
 #include <stdinc.h>
-#include <shaders/Shader.h>
+#include <graphics/Shader.h>
 #include <utils/TextFile.h>
 
 
@@ -27,8 +27,8 @@ Shader::Shader(const std::string& filename, GLenum shaderType)
         std::vector<GLchar> errorLog(logSize);
         glGetShaderInfoLog(m_shader, logSize, &logSize, &errorLog[0]);
         glDeleteShader(m_shader);
-        
-        throw ShaderError(filename, 
+
+        throw ShaderError(filename,
             std::string(&errorLog[0]));
     }
 }

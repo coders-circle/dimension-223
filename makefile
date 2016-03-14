@@ -1,5 +1,5 @@
 ## Directories for source files
-SRC_DIRS := ui image shaders mesh
+SRC_DIRS := ui image graphics
 
 
 ## Directories to build files into

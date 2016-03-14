@@ -24,7 +24,7 @@ public:
 
     /**
      * Construct a new SFML widget with given size.
-     * @param width  Initial width of render window.
+     * @param width Initial width of render window.
      * @param height Initial height of render window.
      */
     SFMLWidget(int width, int height);
@@ -45,14 +45,14 @@ public:
 
     /**
      * Set callback function to call when the widget needs to be drawn.
-     * @param draw  The draw event handler.
+     * @param draw The draw event handler.
      */
     void SetDrawCallback(const std::function<void()>& draw)
     { m_draw = draw; }
 
     /**
      * Set callback function to call when the widget is resized.
-     * @param resize  The resize event handler.
+     * @param resize The resize event handler.
      */
     void SetResizeCallback(const std::function<void(int, int)>& resize)
     { m_resize = resize; }
@@ -60,7 +60,7 @@ public:
     /**
      * Set callback function to call when the widget is succesfully created.
      * This is the right place to perform all the opengl intialization stuffs.
-     * @param draw  The initialization event handler.
+     * @param draw The initialization event handler.
      */
     void SetInitCallback(const std::function<void()>& init)
     { m_init = init; }

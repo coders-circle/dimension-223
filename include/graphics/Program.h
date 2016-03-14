@@ -1,5 +1,5 @@
 #pragma once
-#include <shaders/Shader.h>
+#include <graphics/Shader.h>
 
 
 /// Exception representing program linking error.
@@ -44,8 +44,8 @@ public:
      * Add uniform from the shaders.
      *
      * Effectively, this gets and save the uniform location for later purposes.
-     * @param  uniform_name Name of the uniform variable.
-     * @return              The uniform location.
+     * @param uniform_name Name of the uniform variable.
+     * @return The uniform location.
      */
     GLint AddUniform(const std::string& uniform_name)
     {
@@ -57,8 +57,8 @@ public:
 
     /**
      * Get previously added uniform.
-     * @param  uniform_name Name of the uniform variable.
-     * @return              The uniform location.
+     * @param uniform_name Name of the uniform variable.
+     * @return The uniform location.
      */
     GLint GetUniform(const std::string& uniform_name)
     {

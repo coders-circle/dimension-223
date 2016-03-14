@@ -12,7 +12,7 @@ class TextFile
 public:
     /**
      * Load text from a file.
-     * @param filename  Path of text file to load.
+     * @param filename Path of text file to load.
      */
     TextFile(const std::string& filename) : m_filename(filename)
     {

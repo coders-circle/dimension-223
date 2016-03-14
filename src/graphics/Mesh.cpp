@@ -1,14 +1,14 @@
 #include <stdinc.h>
-#include <mesh/Mesh3D.h>
+#include <graphics/Mesh.h>
 
 
-Mesh3D::Mesh3D(const std::vector<Vertex3D>& vertices,
+Mesh::Mesh(const std::vector<Vertex3D>& vertices,
     const std::vector<GLuint>& indices)
 {
     Build(vertices, indices);
 }
 
-void Mesh3D::Build(const std::vector<Vertex3D>& vertices,
+void Mesh::Build(const std::vector<Vertex3D>& vertices,
     const std::vector<GLuint>& indices)
 {
     // Generate buffers and arrays
@@ -50,7 +50,7 @@ void Mesh3D::Build(const std::vector<Vertex3D>& vertices,
 }
 
 
-void Mesh3D::Render(Material* material, const glm::mat4& model,
+void Mesh::Render(Material* material, const glm::mat4& model,
     const glm::mat4& vp)
 {
     if (material)
@@ -71,7 +71,7 @@ void Mesh3D::Render(Material* material, const glm::mat4& model,
 }
 
 
-Mesh3D::Mesh3D(const glm::vec3& extents, const glm::vec3 &offset)
+Mesh::Mesh(const glm::vec3& extents, const glm::vec3 &offset)
 {
     using namespace glm;
     float halfSizeX = extents[0] / 2.0f;
@@ -126,4 +126,3 @@ Mesh3D::Mesh3D(const glm::vec3& extents, const glm::vec3 &offset)
 
     Build(vertices, indices);
 }
-

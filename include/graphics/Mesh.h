@@ -1,5 +1,5 @@
 #pragma once
-#include <shaders/Material.h>
+#include <graphics/Material.h>
 
 
 /**
@@ -16,8 +16,8 @@ struct Vertex3D {
 
     /**
      * Construct a vertex from given position, normal and texture coordinates.
-     * @param position  3D position vector.
-     * @param normal    3D normal vector.
+     * @param position 3D position vector.
+     * @param normal 3D normal vector.
      * @param texCoords 2D texture coordinates.
      */
     Vertex3D(const glm::vec3& position,
@@ -29,7 +29,7 @@ struct Vertex3D {
      * Construct a vertex from given position.
      *
      * Normal and texture coordinates are set to zero vectors.
-     * @param position  3D position vector.
+     * @param position 3D position vector.
      */
     Vertex3D(const glm::vec3& position)
         : position(position) {}
@@ -46,27 +46,27 @@ struct Vertex3D {
 /**
  * A 3D Mesh that can be rendered with given material.
  */
-class Mesh3D
+class Mesh
 {
 public:
     /**
      * Construct a mesh with given list of vertices and indices.
-     * @param vertices  Array of mesh vertices.
-     * @param indices   Array of indices to the vertices to create triangles.
+     * @param vertices Array of mesh vertices.
+     * @param indices Array of indices to the vertices to create triangles.
      */
-    Mesh3D(const std::vector<Vertex3D>& vertices,
+    Mesh(const std::vector<Vertex3D>& vertices,
         const std::vector<GLuint>& indices);
 
     /**
      * Construct a cuboidal mesh.
-     * @param extents   Length of cuboid in each dimension.
-     * @param offset    Offset of the center of the mesh.
+     * @param extents Length of cuboid in each dimension.
+     * @param offset Offset of the center of the mesh.
      */
-    Mesh3D(const glm::vec3& extents,
+    Mesh(const glm::vec3& extents,
         const glm::vec3& offset=glm::vec3(0));
 
      /// Destroy the OpenGL objects representing this mesh.
-    ~Mesh3D()
+    ~Mesh()
     {
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
@@ -76,8 +76,8 @@ public:
     /**
      * Render the mesh with given material and transformations.
      * @param material Pointer to Material to render this mesh with.
-     * @param model    World transformation matrix.
-     * @param vp       View-Projection transformation matrix.
+     * @param model World transformation matrix.
+     * @param vp View-Projection transformation matrix.
      */
     void Render(Material* material, const glm::mat4& model,
         const glm::mat4& vp);

@@ -40,6 +40,19 @@ public:
     }
 
     /**
+     * Create image of given size, all pixels filled with given value.
+     * @param width Width of the image.
+     * @param height Height of the image.
+     * @param value Initial intensity for all pixels.
+     */
+    Image(int width, int height, const T& value)
+    {
+        m_width = width;
+        m_height = height;
+        m_pixels.resize(width*height, ColorToVec(value));
+    }
+
+    /**
      * Save image to a file.
      * @param filename Name of file to save image to.
      */
@@ -50,21 +63,21 @@ public:
 
     /**
      * Get color of a pixel.
-     * @param  row    Row index of image pixel.
-     * @param  column Column index of image pixel.
-     * @return        Color of the pixel returned as type T.
+     * @param x Column index of image pixel.
+     * @param y Row index of image pixel.
+     * @return Color of the pixel returned as type T.
      */
-    T Get(int row, int column) const
-    { return VecToColor<T>(m_pixels[row*m_width + column]); }
+    T Get(int x, int y) const
+    { return VecToColor<T>(m_pixels[y*m_width + x]); }
 
     /**
      * Set color of a pixel.
-     * @param row    Row index of image pixel.
-     * @param column Column index of image pixel.
-     * @param color  Color of the pixel provided as type T.
+     * @param x Column index of image pixel.
+     * @param y Row index of image pixel.
+     * @param color Color of the pixel provided as type T.
      */
-    void Set(int row, int column, const T& color)
-    { m_pixels[row*m_width + column] = ColorToVec<T>(color); }
+    void Set(int x, int y, const T& color)
+    { m_pixels[y*m_width + x] = ColorToVec<T>(color); }
 
     /**
      * Get array of pixels each of RGBA format.

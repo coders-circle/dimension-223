@@ -1,5 +1,5 @@
 #include <stdinc.h>
-#include <image/Texture.h>
+#include <graphics/Texture.h>
 
 
 Texture::Texture(const Image<>& image)

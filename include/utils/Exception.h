@@ -8,7 +8,7 @@ class Exception: public std::exception
 public:
     /**
      * Construct a new exception.
-     * @param errorMsg  Error message for this exception.
+     * @param errorMsg Error message for this exception.
      */
     Exception(const std::string& errorMsg) : m_errorMsg(errorMsg) {}
 

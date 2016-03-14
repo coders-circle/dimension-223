@@ -14,7 +14,7 @@ class Texture
 public:
     /**
      * Construct texture from an image file.
-     * @param path  Image file path to load image from.
+     * @param path Image file path to load image from.
      */
     Texture(const std::string& path)
         : Texture(Image<>(path)) {}
@@ -33,18 +33,18 @@ public:
 
     /**
      * Get width of the texture image.
-     * @return  Width of the texture in pixels.
+     * @return Width of the texture in pixels.
      */
     int GetWidth() const { return m_width; }
     /**
      * Get height of the texture image.
-     * @return  Height of the texture in pixels.
+     * @return Height of the texture in pixels.
      */
     int GetHeight() const { return m_height; }
 
     /**
      * Get OpenGL texture object reprsented by this object.
-     * @return  OpenGL texture id.
+     * @return OpenGL texture id.
      */
     GLuint GetTexture() const { return m_texture; }
 

@@ -1,5 +1,5 @@
 #include <stdinc.h>
-#include <shaders/Program.h>
+#include <graphics/Program.h>
 
 
 Program::Program(const std::vector<Shader*>& shaders,

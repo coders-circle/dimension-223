@@ -1,5 +1,5 @@
 #pragma once
-#include <shaders/Program.h>
+#include <graphics/Program.h>
 
 /**
  * Abstract base class for materials.

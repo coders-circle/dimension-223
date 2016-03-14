@@ -23,8 +23,8 @@ class Shader
 public:
     /**
      * Construct and compile OpenGL shader object.
-     * @param filename      File path for the shader source.
-     * @param shaderType    OpenGL shader type.
+     * @param filename File path for the shader source.
+     * @param shaderType OpenGL shader type.
      */
     Shader(const std::string& filename, GLenum shaderType);
 
