@@ -9,10 +9,10 @@ You will first need to install the dependencies to build the engine.
 
 ### gtkmm
 
-[gtkmm](http://www.gtkmm.org/en/download.shtml) is C++ binding for the GTK+ library, used for building the main user interface of Dimension-223.
+[gtkmm](http://www.gtkmm.org/en/download.shtml) is C++ binding for the GTK+ library, used for building the main user interface of Dimension-223. Note that since the application uses OpenCV which uses Gtk+ version 2.0, same version of gtkmm should be used.
 
     # For Debian systems, you can install it with apt-get
-    sudo apt-get install libgtkmm-3.0-dev
+    sudo apt-get install libgtkmm-2.4-dev
 
 ### SFML
 
@@ -37,11 +37,11 @@ You will first need to install the dependencies to build the engine.
     sudo apt-get install libglew-dev
 
 
-### Magick++
-[Magick++](http://www.imagemagick.org/Magick++/) is the object-oriented C++ API to the ImageMagick image-processing library.
+### OpenCV
+[OpenCV](http://opencv.org/downloads.html) is a powerful image processing library.
 
     # For Debian systems, you may install it with apt-get
-    sudo apt-get install libmagick++-dev
+    sudo apt-get install libopencv-dev
 
 ### Building Dimension-223
 
@@ -60,5 +60,3 @@ You can then simply run the output software from the bin directory.
 You will need `doxygen` to generate the documentation files. Simply run it with the *Doxyfile* present in the project directory. The generated documentation will be placed inside the *docs* directory.
 
     doxygen Doxyfile
-
-

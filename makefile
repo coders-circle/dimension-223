@@ -16,8 +16,8 @@ OBJ_FILES = $(addprefix $(OBJ_DIR)/,$(CPP_FILES:src/%.cpp=%.o))
 
 ## Compiler, compiler and linker flags and libaries to use
 CXX := g++
-CXXLIBS := `pkg-config --cflags gtkmm-3.0` `Magick++-config --cppflags --cxxflags`
-LDLIBS := `pkg-config --libs gtkmm-3.0` -lGL -lGLEW -lsfml-system -lsfml-window -lsfml-graphics `Magick++-config --ldflags --libs`
+CXXLIBS := `pkg-config --cflags gtkmm-2.4 opencv`
+LDLIBS := `pkg-config --libs gtkmm-2.4 opencv` -lGL -lGLEW -lsfml-system -lsfml-window -lsfml-graphics
 
 CXXFLAGS := -Wall -I include -MMD --std=c++11 $(CXXLIBS)
 LDFLAGS := -std=c++11 $(LDLIBS)

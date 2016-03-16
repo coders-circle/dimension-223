@@ -18,12 +18,10 @@ public:
 
     /**
      * Display the window and starts its main loop.
-     * @param application Application that contains this window.
-     * @return Value returned by the application that runs this window.
      */
-    int Run(Glib::RefPtr<Gtk::Application> application)
+    void Run()
     {
-        return application->run(m_window);
+        Gtk::Main::run(m_window);
     }
 
 private:

@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
         // Run the application
         Application application(argc, argv);
         application.Run();
-        return application.GetReturnCode();
+        return 0;
     }
     catch (const std::exception& e)
     {

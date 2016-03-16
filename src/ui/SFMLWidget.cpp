@@ -50,7 +50,7 @@ void SFMLWidget::on_size_allocate(Gtk::Allocation& allocation)
     }
 }
 
-bool SFMLWidget::on_draw(const ::Cairo::RefPtr< ::Cairo::Context >& cr)
+bool SFMLWidget::on_expose_event(GdkEventExpose* event)
 {
     if (m_draw)
         m_draw();
@@ -103,7 +103,7 @@ void SFMLWidget::on_realize()
         settings.stencilBits = 8;
         settings.antialiasingLevel = 4;
         settings.majorVersion = 3;
-        settings.minorVersion = 3;
+        settings.minorVersion = 0;
 
         renderWindow.create(GET_WINDOW_HANDLE_FROM_GDK(m_refGdkWindow->gobj()),
             settings);
@@ -116,7 +116,7 @@ void SFMLWidget::on_realize()
 void SFMLWidget::on_unrealize()
 {
     m_refGdkWindow.clear();
-    
+
     //Call base class:
     Gtk::Widget::on_unrealize();
 }

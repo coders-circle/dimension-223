@@ -1,5 +1,7 @@
 #pragma once
-#include <Magick++.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <image/utils.h>
 
 
@@ -25,16 +27,16 @@ public:
     Image(const std::string& filename)
     {
         // Read in the image file
-        Magick::Image image;
-        image.read(filename);
+        int flags = CV_LOAD_IMAGE_COLOR;
+        cv::Mat image = cv::imread(filename, flags);
         Construct(image);
     }
 
     /**
-     * Load image from Magick::Image object.
-     * @param image ImageMagick image to use to create this Image object.
+     * Load image from cv::Mat object.
+     * @param image OpenCV image to use to create this Image object.
      */
-    Image(Magick::Image image)
+    Image(const cv::Mat& image)
     {
         Construct(image);
     }
@@ -58,7 +60,7 @@ public:
      */
     void Save(const std::string& filename)
     {
-        CreateMagickImage().write(filename);
+        // CreateMagickImage().write(filename);
     }
 
     /**
@@ -87,15 +89,24 @@ public:
     { return &m_pixels[0][0]; }
 
     /**
-     * Create ImageMagick image from this image object.
-     * @return New ImageMagick::Image object created from stored pixels.
+     * Create cv::Mat image from this image object.
+     * @return New cv::Mat object created from stored pixels.
      */
-    Magick::Image CreateMagickImage() const
+    cv::Mat CreateCVImage()
     {
-        Magick::Image image;
-        image.read(m_width, m_height, "RGBA", Magick::FloatPixel,
-            &m_pixels[0]);
+        cv::Mat image(m_height, m_width, CV_32FC3);
+        cv::Mat source(image.size(), CV_32FC4, &m_pixels[0][0]);
+        cv::cvtColor(source, image, CV_RGBA2BGRA, 4);
         return image;
+    }
+
+    /**
+     * Display the image using OpenCV.
+     */
+    void Show()
+    {
+        cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+        cv::imshow("Display window", CreateCVImage());
     }
 
     /**
@@ -114,17 +125,31 @@ private:
     std::vector<glm::vec4> m_pixels;
     int m_width, m_height;
 
-    void Construct(Magick::Image image)
+    void Construct(const cv::Mat& image)
     {
+        m_width = image.cols;
+        m_height = image.rows;
+
+        // Create copy of image in floating point BGR space.
+        cv::Mat copy;
+
         if (IsGrayscale<T>())
-            image.type(Magick::GrayscaleType);
+        {
+            // Grayscale image is stored as RGBA image but with same RGB values.
+            // Single channel is not used since RGBA texture is used by OpenGL.
+            cv::Mat gray, rgb;
+            cv::cvtColor(image, gray, CV_BGR2GRAY);
+            cv::cvtColor(gray, rgb, CV_GRAY2BGR);
+            rgb.convertTo(copy, CV_32FC3);
+        }
+        else
+            image.convertTo(copy, CV_32FC3);
 
-        m_width = image.columns();
-        m_height = image.rows();
+        copy /= 255.0f;
 
-        // Get the pixels
-        m_pixels.resize(m_width * m_height);
-        image.write(0, 0, m_width, m_height, "RGBA",
-            Magick::FloatPixel, &m_pixels[0]);
+        // Get the pixels.
+        m_pixels.resize(m_width*m_height);
+        cv::Mat destination(copy.size(), CV_32FC4, &m_pixels[0][0]);
+        cv::cvtColor(copy, destination, CV_BGR2RGBA, 4);
     }
 };

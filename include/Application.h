@@ -15,7 +15,7 @@ public:
      * as its GUI front end and the image processors and generators that act
      * its back end.
      * @param argc Command line arguments count.
-     * @param argv Comman line arguments array.
+     * @param argv Command line arguments array.
      */
     Application(int argc, char* argv[]);
 
@@ -23,15 +23,8 @@ public:
      * Run the application, starting by opening the main window.
      */
     void Run();
-
-    /**
-     * Get code returned by the application on exiting.
-     * @return The return code.
-     */
-    int GetReturnCode() const { return m_returnCode; }
-
+    
 private:
-    Glib::RefPtr<Gtk::Application> m_app;
+    Gtk::Main m_gtkMain;
     MainWindow m_mainWindow;
-    int m_returnCode;
 };
