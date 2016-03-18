@@ -103,10 +103,16 @@ void SFMLWidget::on_realize()
         settings.stencilBits = 8;
         settings.antialiasingLevel = 4;
         settings.majorVersion = 3;
-        settings.minorVersion = 0;
+        settings.minorVersion = 3;
 
         renderWindow.create(GET_WINDOW_HANDLE_FROM_GDK(m_refGdkWindow->gobj()),
             settings);
+
+        settings = renderWindow.getSettings();
+        std::cout << "OpenGL version:" <<
+            settings.majorVersion << "." << settings.minorVersion << std::endl;
+
+        std::cout << std::endl;
 
         if (m_init)
             m_init();

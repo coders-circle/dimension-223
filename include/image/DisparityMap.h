@@ -21,8 +21,10 @@ public:
      * @param dMax Maximum disparity in pixels. This value is used to keep the
      *             disparity calculation iteration in check and to normalize
      *             the obtained disparity.
+     * @param windowSize Window size to use for stereo matching calculations.
      */
-    DisparityMap(Image<glm::vec4>& image1, Image<glm::vec4>& image2, int dMax);
+    DisparityMap(Image<glm::vec4>& image1, Image<glm::vec4>& image2,
+        int dMax, int windowSize);
 
     /**
      * Generate a disparity map out of given input images.
@@ -41,6 +43,7 @@ private:
 
     Image<glm::vec4>& m_image1;
     Image<glm::vec4>& m_image2;
-    int m_dMax;
 
+    int m_dMax;
+    int m_windowSize;
 };

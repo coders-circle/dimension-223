@@ -26,8 +26,8 @@ public:
      */
     DiffuseMaterial(const glm::vec4& color=glm::vec4(1),
         Texture* texture=0)
-        : Material(GetDiffuseShaders()), color(color),
-          texture(texture)
+            : Material(GetDiffuseShaders()),
+              color(color), texture(texture)
     {
         m_program.AddUniform("diffuseColor");
         m_program.AddUniform("diffuseTexture");
@@ -41,8 +41,6 @@ public:
     /// Set values of the uniforms of the GLSL program.
     void SetUniforms()
     {
-        // TODO: Set to white texture by default
-
         m_program.SetUniform("diffuseColor", color);
         glActiveTexture(GL_TEXTURE0);
         if (texture)

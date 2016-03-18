@@ -73,6 +73,15 @@ public:
     { return VecToColor<T>(m_pixels[y*m_width + x]); }
 
     /**
+     * Get intensity as floating point value of the given pixel.
+     * @param x Column index of image pixel.
+     * @param y Row index of image pixel.
+     * @return Pixel intesity magintude.
+     */
+    float GetIntensity(int x, int y) const
+    { return glm::length(m_pixels[y*m_width+x]); }
+
+    /**
      * Set color of a pixel.
      * @param x Column index of image pixel.
      * @param y Row index of image pixel.
@@ -120,6 +129,22 @@ public:
      * @return Height of the image in pixels.
      */
     int GetHeight() const { return m_height; }
+
+    /**
+     * Get the nearest x-coordinate that in contained inside the image.
+     * @param  x x-coordinate to crop by the image.
+     * @return   Nearest x-cordinate contained inside the image.
+     */
+    int GetBoundaryX(int x) const
+    { return glm::min(glm::max(0, x), m_width-1); }
+
+    /**
+     * Get the nearest y-coordinate that in contained inside the image.
+     * @param  y y-coordinate to crop by the image.
+     * @return   Nearest y-cordinate contained inside the image.
+     */
+    int GetBoundaryY(int y) const
+    { return glm::min(glm::max(0, y), m_height-1); }
 
 private:
     std::vector<glm::vec4> m_pixels;

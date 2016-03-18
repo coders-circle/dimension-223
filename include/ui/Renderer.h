@@ -2,6 +2,8 @@
 #include <gtkmm.h>
 #include <ui/SFMLWidget.h>
 #include <graphics/Mesh.h>
+#include <graphics/DepthMaterial.h>
+#include <graphics/Camera.h>
 
 /**
  * A renderer class that handles the OpenGL widget and the user interaction
@@ -18,6 +20,8 @@ public:
      */
     Renderer(Gtk::Window& parent, int width, int height);
 
+    ~Renderer();
+
 private:
     SFMLWidget m_widget;
 
@@ -25,4 +29,8 @@ private:
     void OnDraw();
     void OnResize(int width, int height);
 
+    Camera m_camera;
+
+    Mesh* m_worldMesh;
+    DepthMaterial* m_worldMaterial;
 };
