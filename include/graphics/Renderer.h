@@ -12,8 +12,14 @@
  */
 class Renderer {
 public:
+
+    ~Renderer() {
+        finish();
+    }
+
     void init();
     void draw();
+    void resize(int width, int height);
     void finish();
 
 private:
