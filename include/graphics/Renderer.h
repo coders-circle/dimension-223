@@ -1,4 +1,6 @@
 #pragma once
+#include <graphics/PointCloud.h>
+#include <graphics/Camera.h>
 
 
 /**
@@ -12,6 +14,7 @@
  */
 class Renderer {
 public:
+    Renderer();
 
     ~Renderer() {
         finish();
@@ -23,7 +26,8 @@ public:
     void finish();
 
 private:
-    // Camera mCamera;
-    // std::vector<Model> mModels;
+    Camera mCamera;
 
+    Program* mSimpleProgram;
+    PointCloud* mTestCloud;
 };

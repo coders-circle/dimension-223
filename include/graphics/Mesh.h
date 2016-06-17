@@ -1,5 +1,7 @@
 #pragma once
 
+#include <graphics/Program.h>
+
 /**
  * A 3D vertex with position, normal and texture coordinates.
  */
