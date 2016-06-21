@@ -16,5 +16,5 @@ private:
     std::string match(const std::string& tag, const std::string &src);
 
     std::string save(const std::string& filename, const std::string& data,
-        const std::string& mime);
+                     const std::string& mime);
 };

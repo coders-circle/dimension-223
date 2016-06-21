@@ -19,7 +19,10 @@ public:
     }
 
     void draw(const Program& program, const glm::mat4& model,
-        const glm::mat4& viewProjection);
+              const glm::mat4& viewProjection);
+
+    int getWidth() const { return mImage.cols; }
+    int getHeight() const { return mImage.rows; }
 
 private:
     cv::Mat& mImage;
@@ -27,6 +30,7 @@ private:
     std::vector<glm::vec3> mPoints;
 
     std::vector<float> mVertices;
+    std::vector<GLuint> mIndices;
     GLuint mVbo, mIbo, mVao;
     Texture mTexture;
 };

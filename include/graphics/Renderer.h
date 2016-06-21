@@ -1,6 +1,7 @@
 #pragma once
 #include <graphics/PointCloud.h>
 #include <graphics/Camera.h>
+#include <backend/CloudStitcher.h>
 
 
 /**
@@ -29,5 +30,8 @@ private:
     Camera mCamera;
 
     Program* mSimpleProgram;
-    PointCloud* mTestCloud;
+    PointCloud* mTestCloud1;
+    PointCloud* mTestCloud2;
+
+    CloudStitcher* mStitcher;
 };

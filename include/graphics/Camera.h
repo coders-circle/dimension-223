@@ -11,6 +11,16 @@ public:
         mView = glm::translate(glm::mat4(), -position);
     }
 
+    void setTransform(const glm::vec3& position,
+                      float angleX, float angleY, float angleZ) {
+
+        mView =
+            glm::translate(glm::mat4(), -position)
+            * glm::rotate(glm::mat4(), angleX, glm::vec3(1, 0, 0))
+            * glm::rotate(glm::mat4(), angleY, glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(), angleZ, glm::vec3(0, 0, 1));
+    }
+
     glm::mat4 getTransform() {
         return mProjection * mView;
     }

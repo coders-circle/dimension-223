@@ -3,7 +3,7 @@
 
 
 const int MAX_POINTS = 700;
-const int SKIP = 4;
+const int SKIP = 1;
 
 PointCloud::PointCloud(cv::Mat& image, cv::Mat& depthMap)
     : mImage(image), mDepthMap(depthMap), mTexture(image)
@@ -25,15 +25,30 @@ PointCloud::PointCloud(cv::Mat& image, cv::Mat& depthMap)
             float y = -i/(float)MAX_POINTS + 0.5f - yoffset;
             float depth = depthMap.at<cv::Vec3b>(i, j)[0];
 
-            mPoints[i][0] = x * (1-depth/300);
-            mPoints[i][1] = y * (1-depth/300);
-            mPoints[i][2] = depth/300;
+            int index = i*width+j;
+            mPoints[index][0] = x * (1-depth/300);
+            mPoints[index][1] = y * (1-depth/300);
+            mPoints[index][2] = depth/300;
 
-            mVertices[tmp++] = mPoints[i][0];
-            mVertices[tmp++] = mPoints[i][1];
-            mVertices[tmp++] = mPoints[i][2];
+            mVertices[tmp++] = mPoints[index][0];
+            mVertices[tmp++] = mPoints[index][1];
+            mVertices[tmp++] = mPoints[index][2];
             mVertices[tmp++] = j/float(width-1);
             mVertices[tmp++] = i/float(height-1);
+        }
+    }
+
+    mIndices.resize((width/SKIP-1)*(height/SKIP-1)*6);
+    tmp = 0;
+    for (int i=0; i<height/SKIP-1; i++) {
+        for (int j=0; j<width/SKIP-1; j++) {
+            int offset = i*width+j;
+            mIndices[tmp++] = offset;
+            mIndices[tmp++] = offset+1;
+            mIndices[tmp++] = offset+width;
+            mIndices[tmp++] = offset+1;
+            mIndices[tmp++] = offset+1+width;
+            mIndices[tmp++] = offset+width;
         }
     }
 
@@ -57,6 +72,10 @@ PointCloud::PointCloud(cv::Mat& image, cv::Mat& depthMap)
         (GLvoid*)(3*sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size()*sizeof(GLuint),
+        &mIndices[0], GL_STATIC_DRAW);
+
     glBindVertexArray(0);
 }
 
@@ -76,6 +95,8 @@ void PointCloud::draw(const Program& program, const glm::mat4& model,
     mTexture.bind();
 
     glBindVertexArray(mVao);
-    glDrawArrays(GL_POINTS, 0, mVertices.size());
+    // glDrawArrays(GL_POINTS, 0, mVertices.size());
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
+    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
 }
