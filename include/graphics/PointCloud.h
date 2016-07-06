@@ -1,6 +1,5 @@
 #pragma once
 #include <graphics/Mesh.h>
-#include <graphics/Texture.h>
 
 
 /**
@@ -12,7 +11,7 @@ public:
     PointCloud(cv::Mat& image, cv::Mat& depthMap);
     std::vector<glm::vec3>& getPoints() { return mPoints; }
 
-    ~PointCloud() {
+    void destroy() {
         glDeleteBuffers(1, &mVbo);
         glDeleteBuffers(1, &mIbo);
         glDeleteVertexArrays(1, &mVao);

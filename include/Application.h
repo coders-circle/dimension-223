@@ -14,7 +14,7 @@ public:
 
     int run() {
         MainWindow window;
-        return mApp->run(window.getGtkWindow());
+        return mApp->run(window);
     }
 
 private:

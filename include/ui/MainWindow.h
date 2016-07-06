@@ -7,17 +7,23 @@
  * The main Gtk+ window. This handles creation of all widgets and toolbars
  * inside the window.
  */
-class MainWindow {
+class MainWindow : public Gtk::Window {
 public:
     MainWindow();
 
-    Gtk::Window& getGtkWindow() {
-        return mWindow;
-    }
-
 private:
-    Gtk::Window mWindow;
     SFMLWidget mViewport;
     Renderer mRenderer;
 
+    void addMenuItems(Gtk::MenuBar* menuBar);
+    void addToolItems(Gtk::Toolbar* toolbar);
+
+    Gtk::MenuItem* createMenuItem(const std::string& itemName,
+                                  std::function<void()> handler = nullptr) {
+        Gtk::MenuItem* item = Gtk::manage(new Gtk::MenuItem(itemName, true));
+        if (handler) {
+            item->signal_activate().connect(handler);
+        }
+        return item;
+    }
 };

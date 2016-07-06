@@ -27,7 +27,7 @@ public:
         mProgramId = program;
     }
 
-    ~Program() {
+    void destroy() {
         glDeleteProgram(mProgramId);
     }
 

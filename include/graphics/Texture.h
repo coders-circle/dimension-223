@@ -7,6 +7,8 @@
  */
 class Texture {
 public:
+    Texture() : mTextureId(0) {}
+
     Texture(const std::string& filename) {
         load(filename);
     }
@@ -21,7 +23,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, mTextureId);
     }
 
-    ~Texture() {
+    void destroy() {
         glDeleteTextures(1, &mTextureId);
     }
 
