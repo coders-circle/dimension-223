@@ -1,5 +1,7 @@
 #pragma once
+#include <backend/LensBlurImage.h>
 #include <graphics/Mesh.h>
+#include <graphics/Transformation.h>
 
 
 /**
@@ -8,7 +10,7 @@
  */
 class PointCloud {
 public:
-    PointCloud(cv::Mat& image, cv::Mat& depthMap);
+    PointCloud(const std::string& path);
     std::vector<glm::vec3>& getPoints() { return mPoints; }
 
     void destroy() {
@@ -17,15 +19,15 @@ public:
         glDeleteVertexArrays(1, &mVao);
     }
 
-    void draw(const Program& program, const glm::mat4& model,
-              const glm::mat4& viewProjection);
+    void draw(const Program& program, const glm::mat4& viewProjection);
 
-    int getWidth() const { return mImage.cols; }
-    int getHeight() const { return mImage.rows; }
+    int getWidth() { return mLensBlurImage.getImage().cols; }
+    int getHeight() { return mLensBlurImage.getImage().rows; }
+
+    Transformation transformation;
 
 private:
-    cv::Mat& mImage;
-    cv::Mat& mDepthMap;
+    LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
 
     std::vector<float> mVertices;

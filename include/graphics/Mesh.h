@@ -20,14 +20,12 @@ struct Vertex {
 class Mesh {
 public:
     Mesh(const std::vector<Vertex>& vertices,
-         const std::vector<GLuint>& indices,
-         Texture& texture);
+         const std::vector<GLuint>& indices);
 
     void draw(const Program& program, const glm::mat4& model,
-              const glm::mat4& viewProjection);
+              const glm::mat4& viewProjection, Texture& texture);
 
 private:
     GLuint mVao, mVbo, mEbo;
     size_t mNumIndices;
-    Texture& mTexture;
 };

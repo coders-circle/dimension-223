@@ -2,7 +2,9 @@
 #include <graphics/Model.h>
 
 
-Model::Model(const std::string& path) {
+Model::Model(const std::string& path)
+    : mPath(path)
+{
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_Triangulate |
@@ -18,13 +20,13 @@ Model::Model(const std::string& path) {
         throw Exception(msg.str());
     }
 
-    mDirectory = getFolder(path);
+    std::string directory = getFolder(path);
 
     for (size_t i=0; i<scene->mNumMaterials; ++i) {
         aiString path;
         scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &path);
         if (std::string(path.C_Str()) != "") {
-            std::string spath = mDirectory + "/" + getFilename(path.C_Str());
+            std::string spath = directory + "/" + getFilename(path.C_Str());
             mTextures.push_back(Texture(spath));
         }
         else {
@@ -69,21 +71,20 @@ void Model::loadMesh(aiMesh* mesh, const aiScene* scene) {
         }
     }
 
-    if (mesh->mMaterialIndex >= 0) {
-        mMeshes.push_back(Mesh(vertices, indices,
-            mTextures[mesh->mMaterialIndex]));
-    }
-    else {
-        mMeshes.push_back(Mesh(vertices, indices,
-            mTextures[mTextures.size()-1]));
-    }
+    if (mesh->mMaterialIndex >= 0)
+        mMaterialIndices.push_back(mesh->mMaterialIndex);
+    else
+        mMaterialIndices.push_back(mTextures.size()-1);
+
+    mMeshes.push_back(Mesh(vertices, indices));
 }
 
 
-void Model::draw(const Program& program, const glm::mat4& model,
-                 const glm::mat4& viewProjection) {
+void Model::draw(const Program& program, const glm::mat4& viewProjection) {
 
+    glm::mat4 model = transformation.getMatrix();
     for (size_t i=0; i<mMeshes.size(); ++i) {
-        mMeshes[i].draw(program, model, viewProjection);
+        mMeshes[i].draw(program, model, viewProjection,
+            mTextures[mMaterialIndices.size()-1]);
     }
  }

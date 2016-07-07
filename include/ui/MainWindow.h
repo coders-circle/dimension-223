@@ -9,9 +9,11 @@
  */
 class MainWindow : public Gtk::Window {
 public:
-    MainWindow();
+    MainWindow(Project& project);
 
 private:
+    Project& mProject;
+    
     SFMLWidget mViewport;
     Renderer mRenderer;
 

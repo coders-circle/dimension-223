@@ -13,7 +13,8 @@ public:
     }
 
     int run() {
-        MainWindow window;
+        Project project;
+        MainWindow window(project);
         return mApp->run(window);
     }
 

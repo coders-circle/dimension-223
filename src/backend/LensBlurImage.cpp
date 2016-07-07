@@ -3,7 +3,9 @@
 #include <backend/LensBlurImage.h>
 
 
-LensBlurImage::LensBlurImage(const std::string& filename) {
+LensBlurImage::LensBlurImage(const std::string& filename)
+    : mFilename(filename)
+{
     std::ifstream inFile(filename);
     std::stringstream stream;
     stream << inFile.rdbuf();

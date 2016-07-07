@@ -5,8 +5,10 @@
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-MainWindow::MainWindow() :
-    mViewport(WINDOW_WIDTH, WINDOW_HEIGHT)
+MainWindow::MainWindow(Project& project) :
+    mProject(project),
+    mViewport(WINDOW_WIDTH, WINDOW_HEIGHT),
+    mRenderer(project)
 {
     set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
 

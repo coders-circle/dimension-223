@@ -4,6 +4,8 @@
 #include <graphics/Camera.h>
 #include <backend/CloudStitcher.h>
 
+#include <Project.h>
+
 
 /**
  * Central graphics class that handles all OpenGL rendering stuffs.
@@ -16,7 +18,7 @@
  */
 class Renderer {
 public:
-    Renderer();
+    Renderer(Project& project);
 
     ~Renderer() {
         finish();
@@ -28,6 +30,7 @@ public:
     void finish();
 
 private:
+    Project& mProject;
     Camera mCamera;
 
     Program* mSimpleProgram;

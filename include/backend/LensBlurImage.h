@@ -8,6 +8,8 @@ public:
     cv::Mat& getDepthMap() { return mDepth; }
 
 private:
+    std::string mFilename;
+
     cv::Mat mImage;
     cv::Mat mDepth;
 

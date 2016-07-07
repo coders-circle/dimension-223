@@ -3,8 +3,8 @@
 
 
 Mesh::Mesh(const std::vector<Vertex>& vertices,
-           const std::vector<GLuint>& indices,
-           Texture& texture) : mTexture(texture) {
+           const std::vector<GLuint>& indices)
+{
 
     glGenVertexArrays(1, &mVao);
     glGenBuffers(1, &mVbo);
@@ -41,7 +41,8 @@ Mesh::Mesh(const std::vector<Vertex>& vertices,
 
 
 void Mesh::draw(const Program& program, const glm::mat4& model,
-                const glm::mat4& viewProjection) {
+                const glm::mat4& viewProjection, Texture& texture)
+{
 
     program.use();
 
@@ -52,7 +53,7 @@ void Mesh::draw(const Program& program, const glm::mat4& model,
     GLint texLoc = program.getUniformLocation("uTexture");
     glUniform1i(texLoc, 0);
     glActiveTexture(GL_TEXTURE0);
-    mTexture.bind();
+    texture.bind();
 
     glBindVertexArray(mVao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);

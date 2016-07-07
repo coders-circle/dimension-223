@@ -5,9 +5,11 @@
 const int MAX_POINTS = 700;
 const int SKIP = 1;
 
-PointCloud::PointCloud(cv::Mat& image, cv::Mat& depthMap)
-    : mImage(image), mDepthMap(depthMap), mTexture(image)
+PointCloud::PointCloud(const std::string& path)
+    : mLensBlurImage(path), mTexture(mLensBlurImage.getImage())
 {
+    cv::Mat& depthMap = mLensBlurImage.getDepthMap();
+
     int height = depthMap.rows;
     int width = depthMap.cols;
 
@@ -80,9 +82,10 @@ PointCloud::PointCloud(cv::Mat& image, cv::Mat& depthMap)
 }
 
 
-void PointCloud::draw(const Program& program, const glm::mat4& model,
-        const glm::mat4& viewProjection) {
+void PointCloud::draw(const Program& program,
+                      const glm::mat4& viewProjection) {
 
+    glm::mat4 model = transformation.getMatrix();
     program.use();
 
     GLint modelLoc = program.getUniformLocation("model");
