@@ -7,6 +7,10 @@ public:
     cv::Mat& getImage() { return mImage; }
     cv::Mat& getDepthMap() { return mDepth; }
 
+    std::string getFilename() const {
+        return mFilename;
+    }
+
 private:
     std::string mFilename;
 

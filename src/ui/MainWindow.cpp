@@ -68,6 +68,12 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
     Gtk::Menu* fileMenu = Gtk::manage(new Gtk::Menu());
     menuitem_file->set_submenu(*fileMenu);
 
+    fileMenu->append(*createMenuItem("_Load Project", [this]() {
+        loadProject();
+    }));
+    fileMenu->append(*createMenuItem("_Save Project", [this]() {
+        saveProject();
+    }));
     fileMenu->append(*createMenuItem("_Quit", [this]() {
         hide();
     }));
@@ -104,5 +110,46 @@ void MainWindow::addPointCloud() {
     std::string path = openFileDialog("Load Lens Blur Image");
     if (path != "") {
         mProject.addPointCloud(path);
+    }
+}
+
+
+void MainWindow::loadProject() {
+    mProject.clear();
+    std::string path = saveFileDialog("Load project");
+    if (path != "") {
+        std::ifstream file(path);
+
+        size_t numModels;
+        file >> numModels;
+        for (size_t i=0; i<numModels; ++i) {
+            std::string path;
+            std::getline(file, path);
+            mProject.addModel(path);
+        }
+
+        size_t numPointclouds;
+        file >> numPointclouds;
+        for (size_t i=0; i<numPointclouds; ++i) {
+            std::string path;
+            std::getline(file, path);
+            mProject.addPointCloud(path);
+        }
+    }
+}
+
+void MainWindow::saveProject() {
+    std::string path = saveFileDialog("Save project");
+    if (path != "") {
+        std::ofstream file(path);
+        file << mProject.getNumModels();
+        for (size_t i=0; i<mProject.getNumModels(); ++i) {
+            file << mProject.getModel(i).getPath() << std::endl;
+        }
+
+        file << mProject.getNumPointClouds();
+        for (size_t i=0; i<mProject.getNumPointClouds(); ++i) {
+            file << mProject.getPointCloud(i).getPath() << std::endl;
+        }
     }
 }

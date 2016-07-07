@@ -17,6 +17,7 @@ public:
 
     Transformation transformation;
 
+    std::string getPath() const { return mPath; }
 private:
     std::string mPath;
 

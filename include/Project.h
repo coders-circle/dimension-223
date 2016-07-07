@@ -35,6 +35,11 @@ public:
         return mPointClouds.size();
     }
 
+    void clear() {
+        mModels.clear();
+        mPointClouds.clear();
+    }
+
 private:
     std::vector<Model> mModels;
     std::vector<PointCloud> mPointClouds;

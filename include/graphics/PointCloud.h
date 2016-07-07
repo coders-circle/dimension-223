@@ -26,6 +26,10 @@ public:
 
     Transformation transformation;
 
+    std::string getPath() const {
+        return mLensBlurImage.getFilename();
+    }
+
 private:
     LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
