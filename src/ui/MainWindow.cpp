@@ -65,10 +65,10 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
 
     Gtk::MenuItem* menuitem_file = createMenuItem("_File");
     menuBar->append(*menuitem_file);
-    Gtk::Menu* filemenu = Gtk::manage(new Gtk::Menu());
-    menuitem_file->set_submenu(*filemenu);
+    Gtk::Menu* fileMenu = Gtk::manage(new Gtk::Menu());
+    menuitem_file->set_submenu(*fileMenu);
 
-    filemenu->append(*createMenuItem("_Quit", [this]() {
+    fileMenu->append(*createMenuItem("_Quit", [this]() {
         hide();
     }));
 
@@ -76,11 +76,33 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
 
     Gtk::MenuItem* menuitem_edit = createMenuItem("_Edit");
     menuBar->append(*menuitem_edit);
-    Gtk::Menu* editmenu = Gtk::manage(new Gtk::Menu());
-    menuitem_edit->set_submenu(*editmenu);
+    Gtk::Menu* editMenu = Gtk::manage(new Gtk::Menu());
+    menuitem_edit->set_submenu(*editMenu);
+
+    editMenu->append(*createMenuItem("_Add Model", [this]() {
+        addModel();
+    }));
+    editMenu->append(*createMenuItem("_Add Lensblur Model", [this]() {
+        addPointCloud();
+    }));
 }
 
 
 void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
 
+}
+
+
+void MainWindow::addModel() {
+    std::string path = openFileDialog("Load Model");
+    if (path != "") {
+        mProject.addModel(path);
+    }
+}
+
+void MainWindow::addPointCloud() {
+    std::string path = openFileDialog("Load Lens Blur Image");
+    if (path != "") {
+        mProject.addPointCloud(path);
+    }
 }

@@ -21,10 +21,10 @@ void Renderer::init() {
         Shader("shaders/fs_3d.glsl", GL_FRAGMENT_SHADER)
     );
 
-    mProject.addModel("models/homer.x");
-    mProject.getModel(0).transformation.scale = glm::vec3(0.02);
-    mProject.addPointCloud("img/test9.jpg");
-    
+    // mProject.addModel("models/homer.x");
+    // mProject.getModel(0).transformation.scale = glm::vec3(0.02);
+    // mProject.addPointCloud("img/test9.jpg");
+
     mCamera.setPosition(glm::vec3(0, 0, 1.4f));
 
     // cv::Mat p1 = cv::imread("img/p1.bmp");

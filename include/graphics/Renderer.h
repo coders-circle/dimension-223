@@ -36,9 +36,9 @@ private:
     Program* mSimpleProgram;
     Program* m3dProgram;
 
-    Model* mTestModel;
-    PointCloud* mTestCloud1;
-    PointCloud* mTestCloud2;
+    // Model* mTestModel;
+    // PointCloud* mTestCloud1;
+    // PointCloud* mTestCloud2;
 
-    CloudStitcher* mStitcher;
+    // CloudStitcher* mStitcher;
 };
