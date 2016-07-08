@@ -1,10 +1,21 @@
 #include <stdinc.h>
 #include <graphics/Model.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
+
+
+inline glm::vec3 aiToGlm(const aiVector3D& v) {
+    return glm::vec3(v.x, v.y, v.z);
+}
+
+inline glm::vec2 aiToGlm2(const aiVector3D& v) {
+    return glm::vec2(v.x, v.y);
+}
 
 
 Model::Model(const std::string& path)
     : mPath(path)
 {
+    transformation.scale = glm::vec3(0.002f);
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_Triangulate |
@@ -35,18 +46,23 @@ Model::Model(const std::string& path)
     }
     mTextures.push_back(Texture()); // TODO: Use white texture.
 
+    mShape = new btConvexHullShape();
     for (size_t i=0; i<scene->mNumMeshes; ++i) {
         aiMesh* mesh = scene->mMeshes[i];
         loadMesh(mesh, scene);
     }
-}
 
+    btShapeHull hull(mShape);
+	hull.buildHull(mShape->getMargin());
+    btConvexHullShape* simplifiedShape = new btConvexHullShape(
+        (btScalar*)hull.getVertexPointer(), hull.numVertices()
+    );
+    delete mShape;
+    mShape = simplifiedShape;
 
-inline glm::vec3 aiToGlm(aiVector3D& v) {
-    return glm::vec3(v.x, v.y, v.z);
-}
-inline glm::vec2 aiToGlm2(aiVector3D& v) {
-    return glm::vec2(v.x, v.y);
+    mShape->setLocalScaling(glmToBullet(transformation.scale));
+
+    mObject = new Object(this, mShape, transformation.position);
 }
 
 void Model::loadMesh(aiMesh* mesh, const aiScene* scene) {
@@ -63,6 +79,7 @@ void Model::loadMesh(aiMesh* mesh, const aiScene* scene) {
         else {
             vertex.texCoords = glm::vec2(0, 0);
         }
+        mShape->addPoint(glmToBullet(vertex.position));
     }
 
     for (size_t i=0; i<mesh->mNumFaces; ++i) {
@@ -81,10 +98,9 @@ void Model::loadMesh(aiMesh* mesh, const aiScene* scene) {
 
 
 void Model::draw(const Program& program, const glm::mat4& viewProjection) {
-
     glm::mat4 model = transformation.getMatrix();
     for (size_t i=0; i<mMeshes.size(); ++i) {
         mMeshes[i].draw(program, model, viewProjection,
             mTextures[mMaterialIndices.size()-1]);
     }
- }
+}

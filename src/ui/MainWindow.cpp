@@ -8,7 +8,7 @@ const int WINDOW_HEIGHT = 600;
 MainWindow::MainWindow(Project& project) :
     mProject(project),
     mViewport(WINDOW_WIDTH, WINDOW_HEIGHT),
-    mRenderer(project)
+    mRenderer(mViewport, project)
 {
     set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -125,7 +125,14 @@ void MainWindow::loadProject() {
         for (size_t i=0; i<numModels; ++i) {
             std::string path;
             std::getline(file, path);
-            mProject.addModel(path);
+            size_t index = mProject.addModel(path);
+
+            float x, y, z, rx, ry, rz, rw;
+            file >> x >> y >> z >> rx >> ry >> rz >> rw;
+            Model& model = mProject.getModel(index);
+            model.transformation.position = glm::vec3(x, y, z);
+            model.transformation.rotation = glm::quat(rw, rx, ry, rz);
+            model.transform();
         }
 
         size_t numPointclouds;
@@ -144,7 +151,15 @@ void MainWindow::saveProject() {
         std::ofstream file(path);
         file << mProject.getNumModels();
         for (size_t i=0; i<mProject.getNumModels(); ++i) {
-            file << mProject.getModel(i).getPath() << std::endl;
+            Model& model = mProject.getModel(i);
+            file << model.getPath() << std::endl;
+            file << model.transformation.position.x
+                << " " << model.transformation.position.y
+                << " " << model.transformation.position.z
+                << " " << model.transformation.rotation.x
+                << " " << model.transformation.rotation.y
+                << " " << model.transformation.rotation.z
+                << " " << model.transformation.rotation.w;
         }
 
         file << mProject.getNumPointClouds();

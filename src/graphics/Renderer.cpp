@@ -3,8 +3,8 @@
 #include <backend/LensBlurImage.h>
 
 
-Renderer::Renderer(Project& project)
-    : mProject(project)
+Renderer::Renderer(SFMLWidget& viewport, Project& project)
+    : mViewport(viewport), mProject(project), mSelected(true)
 {}
 
 
@@ -43,10 +43,56 @@ void Renderer::init() {
 
 void Renderer::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    mProject.getPhysicsWorld().update();
+
+    int x, y;
+    mViewport.get_pointer(x, y);
+
+    if (mViewport.isLeftMouseDown()) {
+        glm::vec3 rayStart = mCamera.inverse(glm::vec3(x, y, -1));
+        glm::vec3 rayEnd = mCamera.inverse(glm::vec3(x, y, 0));
+        glm::vec3 rayDir(rayEnd - rayStart);
+        rayDir = glm::normalize(rayDir);
+
+        btCollisionWorld::ClosestRayResultCallback
+            rayCallback(glmToBullet(rayStart), glmToBullet(rayDir*1000.0f));
+        mProject.getPhysicsWorld().getWorld()->rayTest(
+            glmToBullet(rayStart), glmToBullet(rayDir*1000.0f),
+            rayCallback
+        );
+
+        if (rayCallback.hasHit()) {
+            const btCollisionObject* body = rayCallback.m_collisionObject;
+            if (body) {
+                size_t model = (size_t)body->getUserPointer();
+                if (mSelection != model || !mSelected) {
+                    mSelected = true;
+                    mSelection = model;
+                    glm::vec3 hitpoint(
+                        rayCallback.m_hitPointWorld.getX(),
+                        rayCallback.m_hitPointWorld.getY(),
+                        rayCallback.m_hitPointWorld.getZ()
+                    );
+                    mHitDist = glm::length(hitpoint - rayStart);
+                    mHitPoint = hitpoint -
+                        mProject.getModel(mSelection).transformation.position;
+                }
+            }
+        }
+
+        if (mSelected) {
+            Model& selection = mProject.getModel(mSelection);
+            glm::vec3 newPos = rayStart + rayDir * mHitDist - mHitPoint;
+            selection.transformation.position = newPos;
+            selection.transform();
+        }
+    }
+    else {
+        mSelected = false;
+    }
 
     static float angle = 0.0f;
-    angle += 0.01f;
-
+    // angle += 0.01f;
     mCamera.setTransformation(glm::vec3(0, 0, 1.4f), 0, angle, 0);
 
     for (size_t i=0; i<mProject.getNumPointClouds(); ++i) {
@@ -55,6 +101,7 @@ void Renderer::draw() {
     }
 
     for (size_t i=0; i<mProject.getNumModels(); ++i) {
+        mProject.getModel(i).update();
         mProject.getModel(i).draw(*m3dProgram, mCamera.getTransformation());
     }
     // mTestCloud1->draw(*mSimpleProgram, glm::mat4(),

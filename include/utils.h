@@ -43,3 +43,13 @@ public:
 private:
     std::string mMessage;
 };
+
+
+inline btVector3 glmToBullet(const glm::vec3& v) {
+    return btVector3(v.x, v.y, v.z);
+}
+
+
+inline btQuaternion glmToBullet(const glm::quat& v) {
+    return btQuaternion(v.x, v.y, v.z, v.w);
+}

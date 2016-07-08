@@ -1,6 +1,7 @@
 #pragma once
 #include <graphics/Model.h>
 #include <graphics/PointCloud.h>
+#include <physics/World.h>
 
 
 /**
@@ -11,7 +12,11 @@ class Project {
 public:
     size_t addModel(const std::string& path) {
         mModels.push_back(Model(path));
-        return mModels.size()-1;
+        size_t index = mModels.size() - 1;
+        mPhysicsWorld.add(*getModel(index).getObject());
+        getModel(index).getObject()->getRigidBody()->setUserPointer(
+            (void*)index);
+        return index;
     }
 
     Model& getModel(size_t index) {
@@ -40,8 +45,11 @@ public:
         mPointClouds.clear();
     }
 
+    World& getPhysicsWorld() { return mPhysicsWorld; }
+
 private:
     std::vector<Model> mModels;
     std::vector<PointCloud> mPointClouds;
+    World mPhysicsWorld;
 
 };

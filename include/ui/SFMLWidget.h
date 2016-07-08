@@ -61,12 +61,20 @@ public:
     void setInitCallback(const std::function<void()>& init)
     { mInit = init; }
 
+    bool isLeftMouseDown() const { return mLeftMouseDown; }
+    bool isRightMouseDown() const { return mRightMouseDown; }
+    bool isMiddleMouseDown() const { return mMiddleMouseDown; }
+
 protected:
+
+    bool mLeftMouseDown, mRightMouseDown, mMiddleMouseDown;
 
     virtual void on_size_allocate(Gtk::Allocation& allocation);
     virtual void on_realize();
     virtual void on_unrealize();
     virtual bool on_draw(const ::Cairo::RefPtr< ::Cairo::Context >& cr);
+    virtual bool on_button_press_event(GdkEventButton* button_event);
+    virtual bool on_button_release_event(GdkEventButton* release_event);
 
     Glib::RefPtr<Gdk::Window> mRefGdkWindow;
 
