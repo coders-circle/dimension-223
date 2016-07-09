@@ -9,10 +9,18 @@
 class InputHandler {
 public:
     InputHandler(Project& project);
+
     void update(float x, float y,
-        bool leftMouseDown, bool middleMouseDown, bool rightMouseDown,
-        unsigned int mouseState);
+                bool leftMouseDown, bool middleMouseDown, bool rightMouseDown,
+                unsigned int mouseState);
+
     void scroll(float dx, float dy);
+
+    void setSelectionChangedCallback(
+        const std::function<void(size_t)>& callback
+    ) {
+        mSelectionChanged = callback;
+    }
 
 private:
     /// The project database.
@@ -41,4 +49,6 @@ private:
     float mZoom;
 
     void updateCamera();
+
+    std::function<void(size_t)> mSelectionChanged;
 };

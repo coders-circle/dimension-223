@@ -1,5 +1,6 @@
 #include <stdinc.h>
 #include <ui/MainWindow.h>
+#include <ui/widget_creator.h>
 
 
 const int WINDOW_WIDTH = 800;
@@ -21,16 +22,11 @@ MainWindow::MainWindow(Project& project) :
     vbox->pack_start(*menuBar, Gtk::PACK_SHRINK, 0);
     addMenuItems(menuBar);
 
-    // The horizontal box with toolbar and viewport.
-    Gtk::Box* hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 0));
-    hbox->set_border_width(5);
-    vbox->add(*hbox);
-
+    // Toolbar.
     Gtk::Toolbar* toolbar = Gtk::manage(new Gtk::Toolbar());
-    toolbar->set_property("orientation", Gtk::ORIENTATION_VERTICAL);
+    toolbar->set_property("orientation", Gtk::ORIENTATION_HORIZONTAL);
     toolbar->set_property("toolbar-style", Gtk::TOOLBAR_ICONS);
     addToolItems(toolbar);
-    // hbox->pack_start(*toolbar, Gtk::PACK_SHRINK, 0); // TODO: Show toolbar.
 
     // Pass viewport event handlers to the renderer.
     mViewport.setResizeCallback([this](int w, int h) {
@@ -43,13 +39,17 @@ MainWindow::MainWindow(Project& project) :
         mRenderer.draw();
         mViewport.invalidate();
     });
+    mRenderer.setSelectionChangedCallback([this](size_t selection)
+    {
+        changeSelection(selection);
+    });
 
     // Show and add the viewport to the window.
     mViewport.show();
-    // mViewport.set_border_width(15);
     mViewport.set_hexpand(true);
     mViewport.set_vexpand(true);
-    hbox->add(mViewport);
+    vbox->add(mViewport);
+    vbox->add(*toolbar);
 
     vbox->show_all();
 
@@ -68,6 +68,9 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
     Gtk::Menu* fileMenu = Gtk::manage(new Gtk::Menu());
     menuitem_file->set_submenu(*fileMenu);
 
+    fileMenu->append(*createMenuItem("_New Project", [this]() {
+        mProject.clear();
+    }));
     fileMenu->append(*createMenuItem("_Load Project", [this]() {
         loadProject();
     }));
@@ -95,9 +98,159 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
 
 
 void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
+    // Gtk::ToolButton *TB1 = new Gtk::ToolButton(Gtk::Stock::GO_BACK);
+    // toolbar->append(*TB1);
 
+    toolbar->append(*createToolItem(
+        Gtk::manage(new Gtk::Label("Translation: ")))
+    );
+    for (int i=0; i<3; ++i) {
+        mTranslations[i] = createSpinEntry();
+        mTranslations[i]->signal_value_changed().connect([this](){
+            updateSelection();
+        });
+        toolbar->append(*createToolItem(mTranslations[i]));
+    }
+    toolbar->append(*Gtk::manage(new Gtk::SeparatorToolItem()));
+
+    toolbar->append(*createToolItem(
+        Gtk::manage(new Gtk::Label("Rotation: ")))
+    );
+    for (int i=0; i<3; ++i) {
+        mRotations[i] = createSpinEntry();
+        mRotations[i]->signal_value_changed().connect([this](){
+            updateSelection();
+        });
+        toolbar->append(*createToolItem(mRotations[i]));
+    }
+    toolbar->append(*Gtk::manage(new Gtk::SeparatorToolItem()));
+
+    toolbar->append(*createToolItem(
+        Gtk::manage(new Gtk::Label("Scale: ")))
+    );
+    for (int i=0; i<3; ++i) {
+        mScales[i] = createSpinEntry(0.0001, 4, 10);
+        mScales[i]->signal_value_changed().connect([this](){
+            updateSelection();
+        });
+        toolbar->append(*createToolItem(mScales[i]));
+    }
+    toolbar->append(*Gtk::manage(new Gtk::SeparatorToolItem()));
 }
 
+
+void MainWindow::changeSelection(size_t selection) {
+    mChanging = true;
+    mSelection = selection;
+    Model& model = mProject.getModel(selection);
+    Transformation& t = model.transformation;
+
+    for (int i=0; i<3; ++i)
+        mTranslations[i]->set_value(t.position[i]);
+
+    glm::vec3 angles = glm::eulerAngles(t.rotation);
+    for (int i=0; i<3; ++i)
+        mRotations[i]->set_value(angles[i]);
+
+    for (int i=0; i<3; ++i)
+        mScales[i]->set_value(t.scale[i]);
+    mChanging = false;
+}
+
+void MainWindow::updateSelection() {
+    if (!mChanging && mSelection < mProject.getNumModels()) {
+        Model& model = mProject.getModel(mSelection);
+        Transformation& t = model.transformation;
+
+        for (int i=0; i<3; ++i) {
+            float val = mTranslations[i]->get_value();
+            t.position[i] = val;
+        }
+
+        glm::vec3 angles;
+        for (int i=0; i<3; ++i) {
+            float val = mRotations[i]->get_value();
+            angles[i] = val;
+        }
+        t.rotation = glm::quat(glm::radians(angles));
+
+        for (int i=0; i<3; ++i) {
+            float val = mScales[i]->get_value();
+            t.scale[i] = val;
+        }
+
+        model.transform();
+    }
+}
+
+
+std::string MainWindow::openFileDialog(const std::string& prompt,
+    const std::vector<filter> filters)
+{
+    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_OPEN);
+    dialog.set_transient_for(*this);
+
+    // Add response buttons the the dialog.
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Open", Gtk::RESPONSE_OK);
+
+    // Add filters.
+    if (filters.size() == 0) {
+        Glib::RefPtr<Gtk::FileFilter> filter_any =
+            Gtk::FileFilter::create();
+        filter_any->set_name("Any files");
+        filter_any->add_pattern("*");
+        dialog.add_filter(filter_any);
+    }
+    else {
+        // TODO
+    }
+
+    int result = dialog.run();
+
+    switch(result) {
+    case(Gtk::RESPONSE_OK):
+        return dialog.get_filename();
+    case(Gtk::RESPONSE_CANCEL):
+    default:
+        return "";
+
+    }
+}
+
+std::string MainWindow::saveFileDialog(const std::string& prompt,
+    const std::vector<filter> filters)
+{
+    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_SAVE);
+    dialog.set_transient_for(*this);
+
+    // Add response buttons the the dialog.
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Save", Gtk::RESPONSE_OK);
+
+    // Add filters.
+    if (filters.size() == 0) {
+        Glib::RefPtr<Gtk::FileFilter> filter_any =
+            Gtk::FileFilter::create();
+        filter_any->set_name("Any files");
+        filter_any->add_pattern("*");
+        dialog.add_filter(filter_any);
+    }
+    else {
+        // TODO
+    }
+
+    int result = dialog.run();
+
+    switch(result) {
+    case(Gtk::RESPONSE_OK):
+        return dialog.get_filename();
+    case(Gtk::RESPONSE_CANCEL):
+    default:
+        return "";
+
+    }
+}
 
 void MainWindow::addModel() {
     std::string path = openFileDialog("Load Model");

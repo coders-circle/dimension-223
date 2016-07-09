@@ -30,6 +30,12 @@ public:
     void resize(int width, int height);
     void finish();
 
+    void setSelectionChangedCallback(
+        const std::function<void(size_t)>& callback
+    ) {
+        mInputHandler.setSelectionChangedCallback(callback);
+    }
+
 private:
     SFMLWidget& mViewport;
     Project& mProject;

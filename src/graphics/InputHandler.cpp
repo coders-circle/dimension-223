@@ -53,6 +53,9 @@ void InputHandler::update(float x, float y,
                     mHitDist = glm::length(hit-rayStart);
                     mHitPoint = hit -
                         mProject.getModel(mSelection).transformation.position;
+
+                    if (mSelectionChanged)
+                        mSelectionChanged(mSelection);
                 }
             }
         }
@@ -63,6 +66,9 @@ void InputHandler::update(float x, float y,
             glm::vec3 newPos = rayStart + rayDir * mHitDist - mHitPoint;
             selection.transformation.position = newPos;
             selection.transform();
+
+            if (mSelectionChanged)
+                mSelectionChanged(mSelection);
         }
     }
     else {

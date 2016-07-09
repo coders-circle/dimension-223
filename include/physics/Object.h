@@ -43,6 +43,8 @@ public:
             glmToBullet(transform.rotation), glmToBullet(transform.position)
         );
         mRigidBody->getMotionState()->setWorldTransform(btransform);
+        mRigidBody->getCollisionShape()->setLocalScaling(
+            glmToBullet(transform.scale));
     }
 
 private:
