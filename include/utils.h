@@ -53,3 +53,14 @@ inline btVector3 glmToBullet(const glm::vec3& v) {
 inline btQuaternion glmToBullet(const glm::quat& v) {
     return btQuaternion(v.x, v.y, v.z, v.w);
 }
+
+
+inline glm::vec3 bulletToGlm(const btVector3& v) {
+    return glm::vec3(v.getX(), v.getY(), v.getZ());
+}
+
+
+inline std::ostream& operator << (std::ostream& out, const glm::vec3& v) {
+    out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+    return out;
+}

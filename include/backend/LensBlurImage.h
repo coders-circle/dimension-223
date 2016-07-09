@@ -1,5 +1,10 @@
 #pragma once
 
+
+/**
+ * A representation of the Google Lens Blur image that
+ * stores both the original image and the depth map encoded in the file.
+ */
 class LensBlurImage {
 public:
     LensBlurImage(const std::string& filename);

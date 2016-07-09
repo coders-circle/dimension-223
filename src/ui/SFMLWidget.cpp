@@ -20,8 +20,9 @@ SFMLWidget::SFMLWidget(int width, int height)
     : mLeftMouseDown(false), mRightMouseDown(false), mMiddleMouseDown(false)
 {
     set_size_request(width, height);
-    set_has_window(false); // Makes this behave like an interal object rather then a parent window.
-    add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+    set_has_window(false); // Makes this behave like an internal object rather then a parent window.
+    add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
+        | Gdk::SCROLL_MASK);
 }
 
 SFMLWidget::~SFMLWidget()
@@ -142,6 +143,7 @@ bool SFMLWidget::on_button_press_event(GdkEventButton* button_event)
         mMiddleMouseDown = true;
     else if (button_event->button == 3)
         mRightMouseDown = true;
+    mMouseState = button_event->state;
     return false;
 }
 
@@ -153,5 +155,12 @@ bool SFMLWidget::on_button_release_event(GdkEventButton* release_event)
         mMiddleMouseDown = false;
     else if (release_event->button == 3)
         mRightMouseDown = false;
+    return false;
+}
+
+bool SFMLWidget::on_scroll_event(GdkEventScroll* scroll_event) {
+    if (mScroll) {
+        mScroll(scroll_event->delta_x, scroll_event->delta_y);
+    }
     return false;
 }

@@ -64,10 +64,17 @@ public:
     bool isLeftMouseDown() const { return mLeftMouseDown; }
     bool isRightMouseDown() const { return mRightMouseDown; }
     bool isMiddleMouseDown() const { return mMiddleMouseDown; }
+    unsigned int getMouseState() const { return mMouseState; }
+
+    void setScrollCallback(const std::function<void(float, float)>& scroll) {
+        mScroll = scroll;
+    }
 
 protected:
 
     bool mLeftMouseDown, mRightMouseDown, mMiddleMouseDown;
+    unsigned int mMouseState;
+    std::function<void(float, float)> mScroll;
 
     virtual void on_size_allocate(Gtk::Allocation& allocation);
     virtual void on_realize();
@@ -75,6 +82,7 @@ protected:
     virtual bool on_draw(const ::Cairo::RefPtr< ::Cairo::Context >& cr);
     virtual bool on_button_press_event(GdkEventButton* button_event);
     virtual bool on_button_release_event(GdkEventButton* release_event);
+    virtual bool on_scroll_event(GdkEventScroll* scroll_event);
 
     Glib::RefPtr<Gdk::Window> mRefGdkWindow;
 

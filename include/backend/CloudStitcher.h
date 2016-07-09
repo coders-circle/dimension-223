@@ -3,6 +3,9 @@
 #include <graphics/PointCloud.h>
 
 
+/**
+ * Point Clouds Stitcher that combines two clouds using ICP.
+ */
 class CloudStitcher {
 public:
     CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2);

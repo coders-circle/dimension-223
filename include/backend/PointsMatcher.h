@@ -4,6 +4,7 @@
 typedef std::vector<unsigned int> index_list;
 
 
+// TODO.
 class PointsMatcher {
 public:
     PointsMatcher(PointCloud& pointCloud1, PointCloud& pointCloud2);

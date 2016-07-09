@@ -1,6 +1,7 @@
 #pragma once
 #include <graphics/Model.h>
 #include <graphics/PointCloud.h>
+#include <graphics/Camera.h>
 #include <physics/World.h>
 
 
@@ -46,10 +47,12 @@ public:
     }
 
     World& getPhysicsWorld() { return mPhysicsWorld; }
+    Camera& getCamera() { return mCamera; }
 
 private:
     std::vector<Model> mModels;
     std::vector<PointCloud> mPointClouds;
     World mPhysicsWorld;
+    Camera mCamera;
 
 };

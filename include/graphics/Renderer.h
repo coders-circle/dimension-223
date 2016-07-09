@@ -1,13 +1,11 @@
 #pragma once
-#include <graphics/PointCloud.h>
-#include <graphics/Model.h>
-#include <graphics/Camera.h>
 #include <backend/CloudStitcher.h>
 
 #include <Project.h>
 #include <ui/SFMLWidget.h>
 
 #include <physics/World.h>
+#include <graphics/InputHandler.h>
 
 
 /**
@@ -35,22 +33,15 @@ public:
 private:
     SFMLWidget& mViewport;
     Project& mProject;
-    Camera mCamera;
 
     Program* mSimpleProgram;
     Program* m3dProgram;
 
-    size_t mSelection;
-    bool mSelected;
-    glm::vec3 mHitPoint;
-    float mHitDist;
+    InputHandler mInputHandler;
 
-    // Model* mTestModel;
     // PointCloud* mTestCloud1;
     // PointCloud* mTestCloud2;
 
     // CloudStitcher* mStitcher;
-
-    // Physics system.
 
 };
