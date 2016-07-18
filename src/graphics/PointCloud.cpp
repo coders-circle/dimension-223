@@ -5,17 +5,38 @@
 const int MAX_POINTS = 700;
 const int SKIP = 1;
 
-PointCloud::PointCloud(const std::string& path)
+PointCloud::PointCloud(
+    const std::string& path,
+    const std::vector<glm::ivec2>& points
+)
     : mLensBlurImage(path), mTexture(mLensBlurImage.getImage())
 {
-    cv::Mat& depthMap = mLensBlurImage.getDepthMap();
 
+    // Get the depth map and its size.
+    cv::Mat& depthMap = mLensBlurImage.getDepthMap();
     int height = depthMap.rows;
     int width = depthMap.cols;
 
+    // Get the floor vertices.
+    std::vector<bool> floorPoints(width*height, false);
+    for (size_t i=0; i<points.size(); ++i) {
+        const glm::ivec2& p = points[i];
+        for (int x = glm::max(0, p.x-16); x < glm::min(width, p.x+16); ++x) {
+            for (int y = glm::max(0, p.y-16); y < glm::min(height, p.y+16);
+                 ++y)
+            {
+                floorPoints[y*width + x] = true;
+            }
+        }
+    }
+
+    float floorY = -9999;
+
+    // Get (x, y) coordinate of the first point.
     float xoffset = float(MAX_POINTS - width)/2.0f / MAX_POINTS;
     float yoffset = float(MAX_POINTS - height)/2.0f / MAX_POINTS;
 
+    // Fill in the point cloud.
     mVertices.resize(width*height/SKIP/SKIP*5);
     mPoints.resize(width*height/SKIP/SKIP);
 
@@ -32,6 +53,14 @@ PointCloud::PointCloud(const std::string& path)
             mPoints[index][1] = y * (1-depth/300);
             mPoints[index][2] = depth/300;
 
+            // Check if a floor point.
+            if (floorPoints[index]) {
+                if (floorY == -9999)
+                    floorY = mPoints[index][1];
+                else
+                    mPoints[index][1] = floorY;
+            }
+
             mVertices[tmp++] = mPoints[index][0];
             mVertices[tmp++] = mPoints[index][1];
             mVertices[tmp++] = mPoints[index][2];
@@ -40,7 +69,7 @@ PointCloud::PointCloud(const std::string& path)
         }
     }
 
-    mTriangleMesh = new btTriangleMesh();
+    // mTriangleMesh = new btTriangleMesh();
 
     mIndices.resize((width/SKIP-1)*(height/SKIP-1)*6);
     tmp = 0;
@@ -54,24 +83,24 @@ PointCloud::PointCloud(const std::string& path)
             mIndices[tmp++] = offset+1+width;
             mIndices[tmp++] = offset+width;
 
-            mTriangleMesh->addTriangle(
-                glmToBullet(mPoints[offset]),
-                glmToBullet(mPoints[offset+1]),
-                glmToBullet(mPoints[offset+width])
-            );
-
-            mTriangleMesh->addTriangle(
-                glmToBullet(mPoints[offset+1]),
-                glmToBullet(mPoints[offset+1+width]),
-                glmToBullet(mPoints[offset+width])
-            );
+            // mTriangleMesh->addTriangle(
+            //     glmToBullet(mPoints[offset]),
+            //     glmToBullet(mPoints[offset+1]),
+            //     glmToBullet(mPoints[offset+width])
+            // );
+            //
+            // mTriangleMesh->addTriangle(
+            //     glmToBullet(mPoints[offset+1]),
+            //     glmToBullet(mPoints[offset+1+width]),
+            //     glmToBullet(mPoints[offset+width])
+            // );
         }
     }
 
     // Create the physics object.
-    mTriangleMeshShape = new btBvhTriangleMeshShape(mTriangleMesh, false);
-    mObject = new Object(this, mTriangleMeshShape, glm::vec3(0),
-        Object::STATIC);
+    // mTriangleMeshShape = new btBvhTriangleMeshShape(mTriangleMesh, false);
+    // mObject = new Object(this, mTriangleMeshShape, glm::vec3(0),
+    //     Object::STATIC);
 
     // Create the vertex and index buffer as well as vertex array
     // objects.

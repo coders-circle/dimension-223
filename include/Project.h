@@ -34,11 +34,14 @@ public:
         return mModels.size();
     }
 
-    size_t addPointCloud(const std::string& path) {
+    size_t addPointCloud(
+        const std::string& path,
+        const std::vector<glm::ivec2>& points
+    ) {
         try {
-            mPointClouds.push_back(PointCloud(path));
+            mPointClouds.push_back(PointCloud(path, points));
             size_t index = mPointClouds.size() - 1;
-            mPhysicsWorld.add(*getPointCloud(index).getObject());
+            // mPhysicsWorld.add(*getPointCloud(index).getObject());
             return index;
         }
         catch (std::exception& e) {

@@ -1,6 +1,7 @@
 #include <stdinc.h>
 #include <ui/MainWindow.h>
 #include <ui/widget_creator.h>
+#include <ui/ImageEditor.h>
 
 
 const int WINDOW_WIDTH = 800;
@@ -278,7 +279,16 @@ void MainWindow::addModel() {
 void MainWindow::addPointCloud() {
     std::string path = openFileDialog("Load Lens Blur Image");
     if (path != "") {
-        mProject.addPointCloud(path);
+        // First open the image in separate window for further processing.
+        ImageEditor editor(path);
+        editor.run();
+
+        auto& points = editor.getPoints();
+        for (size_t i=0; i<points.size(); ++i) {
+        }
+
+        // Next add as the point cloud.
+        mProject.addPointCloud(path, points);
     }
 }
 
@@ -309,7 +319,7 @@ void MainWindow::loadProject() {
         for (size_t i=0; i<numPointclouds; ++i) {
             std::string path;
             std::getline(file, path);
-            mProject.addPointCloud(path);
+            // mProject.addPointCloud(path); TODO Save and load floor points.
         }
     }
 }

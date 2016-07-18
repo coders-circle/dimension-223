@@ -18,4 +18,6 @@ private:
     PointCloud& mPointCloud1;
     PointCloud& mPointCloud2;
 
+    float calculateSAD(int i1, int j1, int i2, int j2, int window);
+
 };

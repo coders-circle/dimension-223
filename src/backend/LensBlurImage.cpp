@@ -33,7 +33,7 @@ LensBlurImage::LensBlurImage(const std::string& filename)
     cv::Mat sub_mat = cv::Mat(mDepth.rows, mDepth.cols, mDepth.type(),
         cv::Scalar(1,1,1))*255;
     cv::subtract(sub_mat, mDepth, temp);
-    cv::Size size(550, mDepth.cols/(float)mDepth.rows*550);
+    cv::Size size(550, mDepth.rows/(float)mDepth.cols*550);
     cv::resize(temp, mDepth, size);
 }
 
