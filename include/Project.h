@@ -12,12 +12,18 @@
 class Project {
 public:
     size_t addModel(const std::string& path) {
-        mModels.push_back(Model(path));
-        size_t index = mModels.size() - 1;
-        mPhysicsWorld.add(*getModel(index).getObject());
-        getModel(index).getObject()->getRigidBody()->setUserPointer(
-            (void*)index);
-        return index;
+        try {
+            mModels.push_back(Model(path));
+            size_t index = mModels.size() - 1;
+            mPhysicsWorld.add(*getModel(index).getObject());
+            getModel(index).getObject()->getRigidBody()->setUserPointer(
+                (void*)index);
+            return index;
+        }
+        catch (std::exception& e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
     }
 
     Model& getModel(size_t index) {
@@ -29,8 +35,16 @@ public:
     }
 
     size_t addPointCloud(const std::string& path) {
-        mPointClouds.push_back(PointCloud(path));
-        return mPointClouds.size()-1;
+        try {
+            mPointClouds.push_back(PointCloud(path));
+            size_t index = mPointClouds.size() - 1;
+            mPhysicsWorld.add(*getPointCloud(index).getObject());
+            return index;
+        }
+        catch (std::exception& e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
     }
 
     PointCloud& getPointCloud(size_t index) {

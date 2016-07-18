@@ -40,6 +40,8 @@ PointCloud::PointCloud(const std::string& path)
         }
     }
 
+    mTriangleMesh = new btTriangleMesh();
+
     mIndices.resize((width/SKIP-1)*(height/SKIP-1)*6);
     tmp = 0;
     for (int i=0; i<height/SKIP-1; i++) {
@@ -51,8 +53,25 @@ PointCloud::PointCloud(const std::string& path)
             mIndices[tmp++] = offset+1;
             mIndices[tmp++] = offset+1+width;
             mIndices[tmp++] = offset+width;
+
+            mTriangleMesh->addTriangle(
+                glmToBullet(mPoints[offset]),
+                glmToBullet(mPoints[offset+1]),
+                glmToBullet(mPoints[offset+width])
+            );
+
+            mTriangleMesh->addTriangle(
+                glmToBullet(mPoints[offset+1]),
+                glmToBullet(mPoints[offset+1+width]),
+                glmToBullet(mPoints[offset+width])
+            );
         }
     }
+
+    // Create the physics object.
+    mTriangleMeshShape = new btBvhTriangleMeshShape(mTriangleMesh, false);
+    mObject = new Object(this, mTriangleMeshShape, glm::vec3(0),
+        Object::STATIC);
 
     // Create the vertex and index buffer as well as vertex array
     // objects.

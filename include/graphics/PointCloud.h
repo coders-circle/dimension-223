@@ -2,6 +2,7 @@
 #include <backend/LensBlurImage.h>
 #include <graphics/Mesh.h>
 #include <graphics/Transformation.h>
+#include <physics/Object.h>
 
 
 /**
@@ -30,9 +31,17 @@ public:
         return mLensBlurImage.getFilename();
     }
 
+    Object* getObject() const {
+        return mObject;
+    }
+
 private:
     LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
+
+    btTriangleMesh* mTriangleMesh;
+    btCollisionShape* mTriangleMeshShape;
+    Object* mObject;
 
     std::vector<float> mVertices;
     std::vector<GLuint> mIndices;

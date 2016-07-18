@@ -13,19 +13,35 @@ of the scale to take effect.
 
 class Object {
 public:
+    enum Type { STATIC, KINEMATIC };
     Object(void* userPointer,
-        btCollisionShape* shape, const glm::vec3& position=glm::vec3())
+           btCollisionShape* shape, const glm::vec3& position=glm::vec3(),
+           Type type = KINEMATIC)
     {
+        btVector3 inertia(0.0, 0.0, 0.0);
+        float mass = 0.0f;
+        if (type != STATIC) {
+            mass = 1.0f;
+            shape->calculateLocalInertia(mass, inertia);
+        }
+
         btDefaultMotionState* motionState = new btDefaultMotionState(
             btTransform(btQuaternion(0,0,0,1), glmToBullet(position))
         );
         btRigidBody::btRigidBodyConstructionInfo
-                ci(0, motionState, shape);
+                ci(mass, motionState, shape, inertia);
         mRigidBody = new btRigidBody(ci);
 
-        mRigidBody->setCollisionFlags(mRigidBody->getCollisionFlags() |
-            btCollisionObject::CF_KINEMATIC_OBJECT);
-        mRigidBody->setActivationState(DISABLE_DEACTIVATION);
+        if (type == KINEMATIC) {
+            mRigidBody->setCollisionFlags(mRigidBody->getCollisionFlags() |
+                btCollisionObject::CF_KINEMATIC_OBJECT);
+            mRigidBody->setActivationState(DISABLE_DEACTIVATION);
+        }
+        else {
+            mRigidBody->setCollisionFlags(mRigidBody->getCollisionFlags() |
+                btCollisionObject::CF_STATIC_OBJECT);
+        }
+        mDynamic = false;
     }
 
     btRigidBody* getRigidBody() const { return mRigidBody; }
@@ -47,7 +63,23 @@ public:
             glmToBullet(transform.scale));
     }
 
+    void setDynamic(bool dynamic) {
+        if (dynamic) {
+            mRigidBody->setCollisionFlags(mRigidBody->getCollisionFlags()
+                & ~btCollisionObject::CF_KINEMATIC_OBJECT);
+        } else {
+            mRigidBody->setCollisionFlags(mRigidBody->getCollisionFlags()
+                | btCollisionObject::CF_KINEMATIC_OBJECT);
+        }
+        mDynamic = dynamic;
+    }
+
+    bool isDynamic() const {
+        return mDynamic;
+    }
+
 private:
     btRigidBody* mRigidBody;
+    bool mDynamic;
 
 };

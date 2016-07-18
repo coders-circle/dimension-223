@@ -117,7 +117,7 @@ void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
         Gtk::manage(new Gtk::Label("Rotation: ")))
     );
     for (int i=0; i<3; ++i) {
-        mRotations[i] = createSpinEntry();
+        mRotations[i] = createSpinEntry(1, 1);
         mRotations[i]->signal_value_changed().connect([this](){
             updateSelection();
         });
@@ -136,6 +136,14 @@ void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
         toolbar->append(*createToolItem(mScales[i]));
     }
     toolbar->append(*Gtk::manage(new Gtk::SeparatorToolItem()));
+
+    // TODO: Use ToolButton.
+    mDynamicButton = Gtk::manage(
+        new Gtk::ToggleButton("Dynamic"));
+    mDynamicButton->signal_toggled().connect([this]() {
+        updateSelection();
+    });
+    toolbar->append(*createToolItem(mDynamicButton));
 }
 
 
@@ -180,6 +188,14 @@ void MainWindow::updateSelection() {
         }
 
         model.transform();
+
+        auto object = model.getObject();
+        bool state = mDynamicButton->get_active();
+        if (object->isDynamic() != state) {
+            mProject.getPhysicsWorld().remove(*object);
+            model.getObject()->setDynamic(state);
+            mProject.getPhysicsWorld().add(*object);
+        }
     }
 }
 

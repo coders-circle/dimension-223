@@ -34,15 +34,25 @@ Model::Model(const std::string& path)
     std::string directory = getFolder(path);
 
     for (size_t i=0; i<scene->mNumMaterials; ++i) {
+        // TODO: Find error in following lines of code.
         aiString path;
         scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+
         if (std::string(path.C_Str()) != "") {
             std::string spath = directory + "/" + getFilename(path.C_Str());
-            mTextures.push_back(Texture(spath));
+
+            try {
+                mTextures.push_back(Texture(spath));
+            }
+            catch (std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+                mTextures.push_back(Texture());
+            }
         }
         else {
             mTextures.push_back(Texture());
         }
+        // mTextures.push_back(Texture());
     }
     mTextures.push_back(Texture()); // TODO: Use white texture.
 

@@ -21,6 +21,7 @@ private:
     void addToolItems(Gtk::Toolbar* toolbar);
 
     Gtk::SpinButton* mTranslations[3], *mScales[3], *mRotations[3];
+    Gtk::ToggleButton* mDynamicButton;
 
     size_t mSelection;
     void changeSelection(size_t selection);

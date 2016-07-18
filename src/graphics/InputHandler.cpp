@@ -76,7 +76,7 @@ void InputHandler::update(float x, float y,
     }
 
     // Camera movement.
-    if (middleMouseDown) {
+    if (rightMouseDown) {
         if (mCameraMoving) {
             float xOffset = x - mLastX;
             float yOffset = y - mLastY;

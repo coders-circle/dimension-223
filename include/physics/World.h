@@ -22,6 +22,10 @@ public:
         mDynamicsWorld->addRigidBody(object.getRigidBody());
     }
 
+    void remove(const Object& object) {
+        mDynamicsWorld->removeRigidBody(object.getRigidBody());
+    }
+
     btDiscreteDynamicsWorld* getWorld() const {
         return mDynamicsWorld;
     }
