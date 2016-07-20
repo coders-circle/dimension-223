@@ -21,4 +21,10 @@ private:
     cv::Mat mImage;
     SurfaceDrawingArea mArea;
 
+    bool on_key_press_event(GdkEventKey* event) override {
+        if (event->keyval == 65307) {
+            hide();
+        }
+        return false;
+    }
 };

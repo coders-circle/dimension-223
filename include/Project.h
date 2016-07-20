@@ -5,6 +5,12 @@
 #include <physics/World.h>
 
 
+struct CloudIntersection {
+    size_t otherPointCloud;
+    Area myArea, otherArea;
+};
+
+
 /**
  * The repository for project data representing an project state. This data is
  * used for saving and loading.
@@ -58,6 +64,25 @@ public:
         return mPointClouds.size();
     }
 
+    size_t addIntersection(size_t other, const Area& myArea,
+                           const Area& otherArea)
+    {
+        CloudIntersection intersection;
+        intersection.otherPointCloud = other;
+        intersection.myArea = myArea;
+        intersection.otherArea = otherArea;
+        mIntersections.push_back(intersection);
+        return mIntersections.size()-1;
+    }
+
+    CloudIntersection& getIntersection(size_t index) {
+        return mIntersections[index];
+    }
+
+    size_t getNumIntersections() const {
+        return mIntersections.size();
+    }
+
     void clear() {
         for (auto& m: mModels)
             m.destroy();
@@ -65,6 +90,7 @@ public:
             p.destroy();
         mModels.clear();
         mPointClouds.clear();
+        mIntersections.clear();
     }
 
     World& getPhysicsWorld() { return mPhysicsWorld; }
@@ -76,4 +102,7 @@ private:
     World mPhysicsWorld;
     Camera mCamera;
 
+    // For each point cloud except the first, store intersection
+    // areas for it and the other point cloud.
+    std::vector<CloudIntersection> mIntersections;
 };

@@ -1,5 +1,11 @@
 #pragma once
 
+
+struct Area {
+    int x1, y1, x2, y2;
+};
+
+
 inline std::string readFile(const std::string& filename) {
     std::ifstream file;
     file.open(filename);

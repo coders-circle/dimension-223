@@ -11,7 +11,8 @@
  */
 class PointCloud {
 public:
-    PointCloud(const std::string& path, const std::vector<glm::ivec2>& points);
+    PointCloud(const std::string& path,
+               const std::vector<glm::ivec2>& floorPixels);
     std::vector<glm::vec3>& getPoints() { return mPoints; }
 
     void destroy() {
@@ -42,6 +43,7 @@ public:
 private:
     LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
+    // std::vector<glm::ivec2> mFloorPixels;
 
     btTriangleMesh* mTriangleMesh;
     btCollisionShape* mTriangleMeshShape;

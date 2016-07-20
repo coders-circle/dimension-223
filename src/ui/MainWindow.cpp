@@ -2,6 +2,7 @@
 #include <ui/MainWindow.h>
 #include <ui/widget_creator.h>
 #include <ui/SurfaceEditor.h>
+#include <ui/CloudPairEditor.h>
 
 
 const int WINDOW_WIDTH = 800;
@@ -282,16 +283,28 @@ void MainWindow::addModel() {
 void MainWindow::addPointCloud() {
     std::string path = openFileDialog("Load Lens Blur Image");
     if (path != "") {
-        // First open the image in separate window for further processing.
-        SurfaceEditor editor(path);
-        editor.run();
-
-        auto& points = editor.getPoints();
-        for (size_t i=0; i<points.size(); ++i) {
-        }
+        // First open the image in separate window for surface drawing.
+        SurfaceEditor* editor = new SurfaceEditor(path);
+        editor->run();
+        editor->hide();
 
         // Next add as the point cloud.
-        mProject.addPointCloud(path, points);
+        mProject.addPointCloud(path, editor->getPoints());
+        delete editor;
+
+        // Next if this is second point cloud, open two images as pairs
+        // for intersection area selection.
+        size_t num = mProject.getNumPointClouds();
+        if (num > 1) {
+            CloudPairEditor* editor2 = new CloudPairEditor(
+                mProject.getPointCloud(num-2).getPath(), path
+            );
+            editor2->run();
+            editor2->hide();
+            mProject.addIntersection(num-2, editor2->getArea2(),
+                                     editor2->getArea1());
+            delete editor2;
+        }
     }
 }
 

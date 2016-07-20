@@ -7,9 +7,11 @@ const int SKIP = 1;
 
 PointCloud::PointCloud(
     const std::string& path,
-    const std::vector<glm::ivec2>& points
+    const std::vector<glm::ivec2>& floorPixels
 )
-    : mLensBlurImage(path), mTexture(mLensBlurImage.getImage())
+    : mLensBlurImage(path),
+      // mFloorPixels(floorPixels),
+      mTexture(mLensBlurImage.getImage())
 {
 
     // Get the depth map and its size.
@@ -19,8 +21,8 @@ PointCloud::PointCloud(
 
     // Get the floor vertices.
     std::vector<bool> floorPoints(width*height, false);
-    for (size_t i=0; i<points.size(); ++i) {
-        const glm::ivec2& p = points[i];
+    for (size_t i=0; i<floorPixels.size(); ++i) {
+        const glm::ivec2& p = floorPixels[i];
         for (int x = glm::max(0, p.x-16); x < glm::min(width, p.x+16); ++x) {
             for (int y = glm::max(0, p.y-16); y < glm::min(height, p.y+16);
                  ++y)
