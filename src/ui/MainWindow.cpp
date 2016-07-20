@@ -1,7 +1,7 @@
 #include <stdinc.h>
 #include <ui/MainWindow.h>
 #include <ui/widget_creator.h>
-#include <ui/ImageEditor.h>
+#include <ui/SurfaceEditor.h>
 
 
 const int WINDOW_WIDTH = 800;
@@ -71,16 +71,19 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
 
     fileMenu->append(*createMenuItem("_New Project", [this]() {
         mProject.clear();
-    }));
+    }, Accelerator('N', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
+
     fileMenu->append(*createMenuItem("_Load Project", [this]() {
         loadProject();
-    }));
+    }, Accelerator('O', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
+
     fileMenu->append(*createMenuItem("_Save Project", [this]() {
         saveProject();
-    }));
+    }, Accelerator('S', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
+
     fileMenu->append(*createMenuItem("_Quit", [this]() {
         hide();
-    }));
+    }, Accelerator('Q', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
 
     // Edit Menu.
 
@@ -280,7 +283,7 @@ void MainWindow::addPointCloud() {
     std::string path = openFileDialog("Load Lens Blur Image");
     if (path != "") {
         // First open the image in separate window for further processing.
-        ImageEditor editor(path);
+        SurfaceEditor editor(path);
         editor.run();
 
         auto& points = editor.getPoints();

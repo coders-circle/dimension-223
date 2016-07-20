@@ -59,6 +59,10 @@ public:
     }
 
     void clear() {
+        for (auto& m: mModels)
+            m.destroy();
+        for (auto& p: mPointClouds)
+            p.destroy();
         mModels.clear();
         mPointClouds.clear();
     }

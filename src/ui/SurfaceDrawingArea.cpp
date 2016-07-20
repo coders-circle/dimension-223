@@ -1,5 +1,5 @@
 #include <stdinc.h>
-#include <ui/ImageDrawingArea.h>
+#include <ui/SurfaceDrawingArea.h>
 
 #include <cairomm/context.h>
 #include <giomm/resource.h>
@@ -7,7 +7,7 @@
 #include <glibmm/fileutils.h>
 
 
-ImageDrawingArea::ImageDrawingArea(
+SurfaceDrawingArea::SurfaceDrawingArea(
     const std::string& imagePath,
     int width, int height
 )
@@ -22,7 +22,7 @@ ImageDrawingArea::ImageDrawingArea(
     mImage = mImage->scale_simple(width, height, Gdk::INTERP_BILINEAR);
 }
 
-bool ImageDrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+bool SurfaceDrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
     Gdk::Cairo::set_source_pixbuf(cr, mImage, 0, 0);
     cr->paint();
@@ -36,7 +36,7 @@ bool ImageDrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return false;
 }
 
-bool ImageDrawingArea::on_button_press_event(GdkEventButton* event) {
+bool SurfaceDrawingArea::on_button_press_event(GdkEventButton* event) {
     if (event->button == 1)
         mLeftButton = true;
     else if (event->button == 3)
@@ -44,7 +44,7 @@ bool ImageDrawingArea::on_button_press_event(GdkEventButton* event) {
     return false;
 }
 
-bool ImageDrawingArea::on_button_release_event(GdkEventButton* event) {
+bool SurfaceDrawingArea::on_button_release_event(GdkEventButton* event) {
     if (event->button == 1)
         mLeftButton = false;
     else if (event->button == 3)
@@ -52,7 +52,7 @@ bool ImageDrawingArea::on_button_release_event(GdkEventButton* event) {
     return false;
 }
 
-bool ImageDrawingArea::on_motion_notify_event(GdkEventMotion* event) {
+bool SurfaceDrawingArea::on_motion_notify_event(GdkEventMotion* event) {
     if (mLeftButton) {
         mPoints.push_back(glm::ivec2(event->x, event->y));
         queue_draw();

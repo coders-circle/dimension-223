@@ -2,10 +2,10 @@
 
 #include <gtkmm.h>
 
-class ImageDrawingArea : public Gtk::DrawingArea
+class SurfaceDrawingArea : public Gtk::DrawingArea
 {
 public:
-    ImageDrawingArea(const std::string& mImagePath, int width, int height);
+    SurfaceDrawingArea(const std::string& mImagePath, int width, int height);
     const std::vector<glm::ivec2>& getPoints() const { return mPoints; }
 
 protected:

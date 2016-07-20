@@ -25,6 +25,9 @@ LensBlurImage::LensBlurImage(const std::string& filename)
     std::string depthFile = save("tmp_depth", depth, dmime);
     std::string imgFile = save("tmp_image", image, imime);
 
+    // imgFile = "img/kinect.png";
+    // depthFile = "img/kinect_depth.png";
+
     mDepth = cv::imread(depthFile);
     mImage = cv::imread(imgFile);
 

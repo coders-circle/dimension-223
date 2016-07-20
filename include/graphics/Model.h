@@ -29,6 +29,13 @@ public:
 
     Object* getObject() const { return mObject; }
 
+    void destroy() {
+        for (auto& m: mMeshes)
+            m.destroy();
+        for (auto& t: mTextures)
+            t.destroy();
+    }
+
 private:
     std::string mPath;
     btConvexHullShape* mShape;

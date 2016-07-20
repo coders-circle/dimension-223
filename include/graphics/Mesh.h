@@ -25,6 +25,12 @@ public:
     void draw(const Program& program, const glm::mat4& model,
               const glm::mat4& viewProjection, Texture& texture);
 
+    void destroy() {
+        glDeleteBuffers(1, &mVbo);
+        glDeleteBuffers(1, &mEbo);
+        glDeleteVertexArrays(1, &mVao);
+    }
+
 private:
     GLuint mVao, mVbo, mEbo;
     size_t mNumIndices;

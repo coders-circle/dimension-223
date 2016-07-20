@@ -2,13 +2,38 @@
 #include <limits>
 
 
+struct Accelerator {
+    bool null;
+    guint accel_key;
+    Gdk::ModifierType accel_mods;
+    Glib::RefPtr<Gtk::AccelGroup> accel_group;
+
+    Accelerator() : null(true) {}
+    Accelerator(
+        guint accel_key,
+        Gdk::ModifierType accel_mods,
+        const Glib::RefPtr<Gtk::AccelGroup>& accel_group
+    )
+        : null(false), accel_key(accel_key),
+          accel_mods(accel_mods), accel_group(accel_group)
+    {}
+};
+
+
 inline Gtk::MenuItem* createMenuItem(
     const std::string& itemName,
-    std::function<void()> handler = nullptr
+    std::function<void()> handler = nullptr,
+    const Accelerator& accelerator = Accelerator()
 ) {
     Gtk::MenuItem* item = Gtk::manage(new Gtk::MenuItem(itemName, true));
     if (handler) {
         item->signal_activate().connect(handler);
+    }
+
+    if (!accelerator.null) {
+        item->add_accelerator("activate", accelerator.accel_group,
+                              accelerator.accel_key, accelerator.accel_mods,
+                              Gtk::ACCEL_VISIBLE);
     }
     return item;
 }
