@@ -2,15 +2,22 @@
 #include <backend/CloudStitcher.h>
 
 
-CloudStitcher::CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2)
-    : mMatcher(pointCloud1, pointCloud2),
+CloudStitcher::CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2,
+                             const Area& area1, const Area& area2)
+    : mMatcher(pointCloud1, pointCloud2, area1, area2),
       mRotation(glm::mat3()), mTranslation(0)
 {}
 
 
 void CloudStitcher::stitch() {
-    std::vector<glm::vec3>& pointCloud1 = mMatcher.getPointCloud1().getPoints();
-    std::vector<glm::vec3>& pointCloud2 = mMatcher.getPointCloud2().getPoints();
+    const std::vector<glm::vec3>& pointCloud1 = mMatcher.getPoints1();
+    const std::vector<glm::vec3>& pointCloud2 = mMatcher.getPoints2();
+
+    if (pointCloud1.size() == 0 || pointCloud2.size() == 0) {
+        std::cout << "No intersection area" << std::endl;
+        return;
+    }
+
     std::vector<glm::vec3> transformedPointCloud2(pointCloud2.size());
     std::vector<unsigned int> temp(pointCloud1.size());
 
@@ -19,7 +26,7 @@ void CloudStitcher::stitch() {
     }
 
     // while (true) {
-    for (unsigned int iter=0; iter<5; ++iter) {
+    for (unsigned int iter=0; iter<15; ++iter) {
         std::cout << "Iter #" << iter << std::endl;
 
         // Step 1: Initialization
@@ -42,10 +49,10 @@ void CloudStitcher::stitch() {
         error = glm::abs(temp[0] - temp_temp);
 
         // Match the rest considering the neighbourhood of previous match.
-        int width = mMatcher.getPointCloud2().getWidth();
+        int width = mMatcher.getWidth2();
 #define WINDOW_SIZE 10
 
-        for (unsigned int i=1; i<pc2.size(); ++i) {
+        for (unsigned int i=1; i<pc1.size(); ++i) {
             temp_temp = temp[i];
             int startIndex = temp[i-1] - width*WINDOW_SIZE/2 - WINDOW_SIZE/2 + 1;
             temp[i] = getClosest(pc1[i], pc2, startIndex, WINDOW_SIZE,
@@ -53,7 +60,6 @@ void CloudStitcher::stitch() {
             error += glm::abs(temp[i] - temp_temp);
         }
 
-        // Termination condition
         // if (error <= 5) {
         //     break;
         // }
@@ -65,8 +71,8 @@ void CloudStitcher::stitch() {
         std::vector<glm::vec3> a_dash(pointCloud1.size());
         std::vector<glm::vec3> b_dash(pointCloud1.size());
         for (unsigned int i=0; i<pointCloud1.size(); i+=1) {
-            a_dash[i]= pointCloud1[i] - a_bar;
-            b_dash[i]= transformedPointCloud2[temp[i]] - b_bar;
+            a_dash[i] = pointCloud1[i] - a_bar;
+            b_dash[i] = transformedPointCloud2[temp[i]] - b_bar;
         }
 
         // Calculate matrix N and its SVD.
@@ -92,13 +98,13 @@ void CloudStitcher::stitch() {
         // std::cout << glm::to_string(mRotation) << std::endl;
 
         mTranslation = -mRotation * b_bar + a_bar;
-
     }
     // std::cout << glm::to_string(mTranslation) << std::endl;
+    // std::cout << glm::to_string(mRotation) << std::endl;
 }
 
-unsigned int CloudStitcher::getClosest(glm::vec3& v,
-                                       std::vector<glm::vec3>& points) {
+unsigned int CloudStitcher::getClosest(const glm::vec3& v,
+                                       const std::vector<glm::vec3>& points) {
     float minDist = 99999;
     unsigned int minId = 0;
 
@@ -112,20 +118,19 @@ unsigned int CloudStitcher::getClosest(glm::vec3& v,
     return minId;
 }
 
-unsigned int CloudStitcher::getClosest(glm::vec3& v,
-                                       std::vector<glm::vec3>& points,
+unsigned int CloudStitcher::getClosest(const glm::vec3& v,
+                                       const std::vector<glm::vec3>& points,
                                        int startIndex, int cols, int rows,
                                        int skip) {
-
     float minDist = 99999;
-    unsigned int minId = startIndex;
+    int minId = startIndex;
 
     for (int i=0; i<rows; ++i) {
         for (int j=0; j<cols; ++j) {
-            unsigned int index = startIndex + (i*skip + j);
+            int index = startIndex + (i*skip + j);
             if (index < 0)
                 continue;
-            if (index >= points.size())
+            if (index >= (int)points.size())
                 break;
             float dist = glm::length2(points[index] - v);
             if (dist < minDist) {
@@ -134,6 +139,5 @@ unsigned int CloudStitcher::getClosest(glm::vec3& v,
             }
         }
     }
-
     return minId;
 }

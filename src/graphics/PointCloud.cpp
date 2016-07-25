@@ -41,6 +41,7 @@ PointCloud::PointCloud(
     // Fill in the point cloud.
     mVertices.resize(width*height/SKIP/SKIP*5);
     mPoints.resize(width*height/SKIP/SKIP);
+    mImageCoordinates.resize(width*height/SKIP/SKIP);
 
     int tmp = 0;
     for (int i=0; i<height; i+=SKIP) {
@@ -54,6 +55,8 @@ PointCloud::PointCloud(
             mPoints[index][0] = x * (1-depth/300);
             mPoints[index][1] = y * (1-depth/300);
             mPoints[index][2] = depth/300;
+
+            mImageCoordinates[index] = glm::ivec2(j, i);
 
             // Check if a floor point.
             if (floorPoints[index]) {
@@ -150,6 +153,6 @@ void PointCloud::draw(const Program& program,
     glBindVertexArray(mVao);
     // glDrawArrays(GL_POINTS, 0, mVertices.size());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
-    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
 }

@@ -8,7 +8,8 @@
  */
 class CloudStitcher {
 public:
-    CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2);
+    CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2,
+                  const Area& area1, const Area& area2);
 
     void setTransformation(const glm::mat3& rotation,
                            const glm::vec3& translation) {
@@ -28,7 +29,9 @@ private:
     glm::mat3 mRotation;
     glm::vec3 mTranslation;
 
-    unsigned int getClosest(glm::vec3& v, std::vector<glm::vec3>& points);
-    unsigned int getClosest(glm::vec3& v, std::vector<glm::vec3>& points,
+    unsigned int getClosest(const glm::vec3& v,
+                            const std::vector<glm::vec3>& points);
+    unsigned int getClosest(const glm::vec3& v,
+                            const std::vector<glm::vec3>& points,
                             int startIndex, int cols, int rows, int skip);
 };

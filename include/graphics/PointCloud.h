@@ -13,7 +13,12 @@ class PointCloud {
 public:
     PointCloud(const std::string& path,
                const std::vector<glm::ivec2>& floorPixels);
+
     std::vector<glm::vec3>& getPoints() { return mPoints; }
+
+    const std::vector<glm::ivec2>& getImageCoordinates() const {
+        return mImageCoordinates;
+    }
 
     void destroy() {
         glDeleteBuffers(1, &mVbo);
@@ -25,6 +30,8 @@ public:
 
     int getWidth() { return mLensBlurImage.getImage().cols; }
     int getHeight() { return mLensBlurImage.getImage().rows; }
+    int getDepthWidth() { return mLensBlurImage.getDepthMap().cols; }
+    int getDepthHeight() { return mLensBlurImage.getDepthMap().rows; }
 
     Transformation transformation;
 
@@ -38,11 +45,12 @@ public:
 
     LensBlurImage& getImage() {
         return mLensBlurImage;
-    }
+    };
 
 private:
     LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
+    std::vector<glm::ivec2> mImageCoordinates;
     // std::vector<glm::ivec2> mFloorPixels;
 
     btTriangleMesh* mTriangleMesh;

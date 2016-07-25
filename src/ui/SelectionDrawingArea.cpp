@@ -55,16 +55,21 @@ bool SelectionDrawingArea::on_button_release_event(GdkEventButton* event) {
 
         mArea.x2 = event->x;
         mArea.y2 = event->y;
+
+        int x1 = glm::max(0, glm::min(mArea.x1, mArea.x2));
+        int x2 = glm::min(mWidth, glm::max(mArea.x1, mArea.x2));
+        int y1 = glm::max(0, glm::min(mArea.y1, mArea.y2));
+        int y2 = glm::min(mHeight, glm::max(mArea.y1, mArea.y2));
+        mArea.x1 = x1; mArea.x2 = x2; mArea.y1 = y1; mArea.y2 = y2;
     }
     return false;
 }
 
 bool SelectionDrawingArea::on_motion_notify_event(GdkEventMotion* event) {
     if (mLeftButton) {
-        queue_draw();
-
         mArea.x2 = event->x;
         mArea.y2 = event->y;
+        queue_draw();
     }
     return false;
 }

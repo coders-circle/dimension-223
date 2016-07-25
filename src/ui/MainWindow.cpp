@@ -281,7 +281,14 @@ void MainWindow::addModel() {
 }
 
 void MainWindow::addPointCloud() {
+    // static int i=0;
+    // i++;
     std::string path = openFileDialog("Load Lens Blur Image");
+    // if (i==1)
+    //     path = "img/test9.jpg";
+    // else
+    //     path = "img/test9.jpg";
+
     if (path != "") {
         // First open the image in separate window for surface drawing.
         SurfaceEditor* editor = new SurfaceEditor(path);
@@ -303,6 +310,17 @@ void MainWindow::addPointCloud() {
             editor2->hide();
             mProject.addIntersection(num-2, editor2->getArea2(),
                                      editor2->getArea1());
+
+            std::cout << "Stitching" << std::endl;
+            CloudStitcher cs(mProject.getPointCloud(num-2),
+                             mProject.getPointCloud(num-1),
+                             editor2->getArea1(),
+                             editor2->getArea2());
+            cs.stitch();
+            mProject.getPointCloud(num-1).transformation.setMatrix(
+                cs.getTransformation()
+            );
+            std::cout << "Done" << std::endl;
             delete editor2;
         }
     }
