@@ -18,7 +18,8 @@ public:
     }
 
     glm::mat4 getTransformation() {
-        return glm::translate(glm::mat4(), mTranslation) * glm::mat4(mRotation);
+        // return glm::translate(glm::mat4(), mTranslation) * glm::mat4(mRotation);
+        return mTransformation;
     }
 
     void stitch();
@@ -28,6 +29,8 @@ private:
 
     glm::mat3 mRotation;
     glm::vec3 mTranslation;
+
+    glm::mat4 mTransformation;
 
     unsigned int getClosest(const glm::vec3& v,
                             const std::vector<glm::vec3>& points);

@@ -10,6 +10,8 @@ CloudStitcher::CloudStitcher(PointCloud& pointCloud1, PointCloud& pointCloud2,
 
 
 void CloudStitcher::stitch() {
+
+    /*
     const std::vector<glm::vec3>& pointCloud1 = mMatcher.getPoints1();
     const std::vector<glm::vec3>& pointCloud2 = mMatcher.getPoints2();
 
@@ -101,6 +103,19 @@ void CloudStitcher::stitch() {
     }
     // std::cout << glm::to_string(mTranslation) << std::endl;
     // std::cout << glm::to_string(mRotation) << std::endl;
+    */
+
+    auto pc1 = mMatcher.getPclCloud1();
+    auto pc2 = mMatcher.getPclCloud2();
+    pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+    icp.setInputSource(pc2);
+    icp.setInputTarget(pc1);
+    
+    pcl::PointCloud<pcl::PointXYZ> pc3;
+    icp.align(pc3);
+    std::cout << icp.getFitnessScore() << std::endl;
+
+    mTransformation = glm::make_mat4(icp.getFinalTransformation().data());
 }
 
 unsigned int CloudStitcher::getClosest(const glm::vec3& v,

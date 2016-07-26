@@ -4,6 +4,9 @@
 #include <graphics/Transformation.h>
 #include <physics/Object.h>
 
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/registration/icp.h>
 
 /**
  * A collection of vertices or points in space like a mesh, but untriangulated.
@@ -47,6 +50,10 @@ public:
         return mLensBlurImage;
     };
 
+    pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud() {
+        return mPclCloud;
+    }
+
 private:
     LensBlurImage mLensBlurImage;
     std::vector<glm::vec3> mPoints;
@@ -61,4 +68,6 @@ private:
     std::vector<GLuint> mIndices;
     GLuint mVbo, mIbo, mVao;
     Texture mTexture;
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud;
 };

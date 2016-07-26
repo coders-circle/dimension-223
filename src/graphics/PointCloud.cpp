@@ -11,7 +11,8 @@ PointCloud::PointCloud(
 )
     : mLensBlurImage(path),
       // mFloorPixels(floorPixels),
-      mTexture(mLensBlurImage.getImage())
+      mTexture(mLensBlurImage.getImage()),
+      mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
 {
 
     // Get the depth map and its size.
@@ -43,6 +44,11 @@ PointCloud::PointCloud(
     mPoints.resize(width*height/SKIP/SKIP);
     mImageCoordinates.resize(width*height/SKIP/SKIP);
 
+    mPclCloud->width = width/SKIP;
+    mPclCloud->height = height/SKIP;
+    mPclCloud->is_dense = false;
+    mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
+
     int tmp = 0;
     for (int i=0; i<height; i+=SKIP) {
         for (int j=0; j<width; j+=SKIP) {
@@ -57,6 +63,10 @@ PointCloud::PointCloud(
             mPoints[index][2] = depth/300;
 
             mImageCoordinates[index] = glm::ivec2(j, i);
+
+            mPclCloud->points[index].x = mPoints[index][0];
+            mPclCloud->points[index].y = mPoints[index][1];
+            mPclCloud->points[index].z = mPoints[index][2];
 
             // Check if a floor point.
             if (floorPoints[index]) {

@@ -11,39 +11,65 @@ You will first need to install the dependencies to build the engine.
 
 [SFML](http://www.sfml-dev.org/download.php) provides simple cross platform interface for rendering with OpenGL. A custom SFML widget is used to integrate SFML with gtkmm window to render OpenGL in our user interface.
 
-    # For Debian systems, you may install it with apt-get
-    sudo apt-get install libsfml-dev
+```bash
+$ sudo apt-get install libsfml-dev
+```
 
 ### GLM
 
 [GLM](http://glm.g-truc.net/0.9.7/index.html) is OpenGL Mathematics library containing header only implementation based on GLSL specifications.
 
-    # For Debian systems, you may install it with apt-get
-    sudo apt-get install libglm-dev
+```bash
+$ sudo apt-get install libglm-dev
+```
 
 
 ### GLEW
 
 [GLEW](http://glew.sourceforge.net/index.html) provides efficient extension loading library for OpenGL applications.
 
-    # For Debian systems, you may install it with apt-get
-    sudo apt-get install libglew-dev
+```
+$ sudo apt-get install libglew-dev
+```
+
+
+### Gtkmm
+
+TODO
+
+
+### OpenCV
+
+TODO
+
+### Point Cloud Library
+
+TODO
+
+
+### Bullet
+
+TODO
 
 
 ### Building Dimension-223
 
-Simply execute `make` to build the software, which is then built into the *bin* directory. If error is encountered, try to clean up the previous build outputs using `make clean`.
+You need `cmake` to build the application. From inside the project directory, run:
 
-    make clean
-    make
+```bash
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+```
 
-You can then simply run the output software from the bin directory.
-
-    bin/d223
+The application `d223` is then built in the *build* directory.
 
 
 ### Building Docs
 
 You will need `doxygen` to generate the documentation files. Simply run it with the *Doxyfile* present in the project directory. The generated documentation will be placed inside the *docs* directory.
 
-    doxygen Doxyfile
+```bash
+$ doxygen Doxyfile
+```
