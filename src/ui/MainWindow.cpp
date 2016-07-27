@@ -3,6 +3,7 @@
 #include <ui/widget_creator.h>
 #include <ui/SurfaceEditor.h>
 #include <ui/CloudPairEditor.h>
+#include <ui/InputDialog.h>
 
 
 const int WINDOW_WIDTH = 800;
@@ -205,131 +206,77 @@ void MainWindow::updateSelection() {
 }
 
 
-std::string MainWindow::openFileDialog(const std::string& prompt,
-    const std::vector<filter> filters)
-{
-    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_OPEN);
-    dialog.set_transient_for(*this);
-
-    // Add response buttons the the dialog.
-    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-    dialog.add_button("_Open", Gtk::RESPONSE_OK);
-
-    // Add filters.
-    if (filters.size() == 0) {
-        Glib::RefPtr<Gtk::FileFilter> filter_any =
-            Gtk::FileFilter::create();
-        filter_any->set_name("Any files");
-        filter_any->add_pattern("*");
-        dialog.add_filter(filter_any);
-    }
-    else {
-        // TODO
-    }
-
-    int result = dialog.run();
-
-    switch(result) {
-    case(Gtk::RESPONSE_OK):
-        return dialog.get_filename();
-    case(Gtk::RESPONSE_CANCEL):
-    default:
-        return "";
-
-    }
-}
-
-std::string MainWindow::saveFileDialog(const std::string& prompt,
-    const std::vector<filter> filters)
-{
-    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_SAVE);
-    dialog.set_transient_for(*this);
-
-    // Add response buttons the the dialog.
-    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-    dialog.add_button("_Save", Gtk::RESPONSE_OK);
-
-    // Add filters.
-    if (filters.size() == 0) {
-        Glib::RefPtr<Gtk::FileFilter> filter_any =
-            Gtk::FileFilter::create();
-        filter_any->set_name("Any files");
-        filter_any->add_pattern("*");
-        dialog.add_filter(filter_any);
-    }
-    else {
-        // TODO
-    }
-
-    int result = dialog.run();
-
-    switch(result) {
-    case(Gtk::RESPONSE_OK):
-        return dialog.get_filename();
-    case(Gtk::RESPONSE_CANCEL):
-    default:
-        return "";
-
-    }
-}
 
 void MainWindow::addModel() {
-    std::string path = openFileDialog("Load Model");
+    std::string path = openFileDialog(*this, "Load Model");
     if (path != "") {
         mProject.addModel(path);
     }
 }
 
+
 void MainWindow::addPointCloud() {
-    // static int i=0;
-    // i++;
-    std::string path = openFileDialog("Load Lens Blur Image");
-    // if (i==1)
-    //     path = "img/test9.jpg";
-    // else
-    //     path = "img/test9.jpg";
 
-    if (path != "") {
-        // First open the image in separate window for surface drawing.
-        SurfaceEditor* editor = new SurfaceEditor(path);
-        editor->run();
-        editor->hide();
-
-        // Next add as the point cloud.
-        mProject.addPointCloud(path, editor->getPoints());
-        delete editor;
-
-        // Next if this is second point cloud, open two images as pairs
-        // for intersection area selection.
-        size_t num = mProject.getNumPointClouds();
-        if (num > 1) {
-            CloudPairEditor* editor2 = new CloudPairEditor(
-                mProject.getPointCloud(num-2).getPath(), path
-            );
-            editor2->run();
-            editor2->hide();
-            mProject.addIntersection(num-2, editor2->getArea2(),
-                                     editor2->getArea1());
-
-            std::cout << "Stitching" << std::endl;
-            CloudStitcher cs(mProject.getPointCloud(num-2),
-                             mProject.getPointCloud(num-1),
-                             editor2->getArea1(),
-                             editor2->getArea2());
-            cs.stitch();
-            mProject.getPointCloud(num-1).transformation.setMatrix(
-                cs.getTransformation()
-            );
-            std::cout << "Done" << std::endl;
-            delete editor2;
+    InputDialog inputDialog(
+        [this] (const InputData& inputData) {
+            std::vector<glm::ivec2> points;
+            mProject.addPointCloud(inputData, points);
         }
-    }
+    );
+
+    inputDialog.set_transient_for(*this);
+    inputDialog.run();
+    inputDialog.hide();
+
+    // std::string path = openFileDialog(*this, "Load Lens Blur Image");
+    // if (path != "") {
+    //     // First open the image in separate window for surface drawing.
+    //     SurfaceEditor* editor = new SurfaceEditor(path);
+    //     editor->set_transient_for(*this);
+    //     editor->run();
+    //     editor->hide();
+
+    //     // Next add as the point cloud.
+    //     LensBlurImage lbi(path);
+    //     mProject.addPointCloud(
+    //         InputData(lbi.getImage(), lbi.getDepthMap()),
+    //         editor->getPoints()
+    //     );
+    //     delete editor;
+
+    //     // Next if this is second point cloud, open two images as pairs
+    //     // for intersection area selection.
+    //     size_t num = mProject.getNumPointClouds();
+    //     if (num > 1) {
+    //         CloudPairEditor* editor2 = new CloudPairEditor(
+    //             mProject.getPointCloud(num-2).getInputData().getImage(),
+    //             cv::imread(path)
+    //         );
+    //         editor2->set_transient_for(*this);
+    //         editor2->run();
+    //         editor2->hide();
+    //         mProject.addIntersection(num-2, editor2->getArea2(),
+    //                                  editor2->getArea1());
+
+    //         std::cout << "Stitching" << std::endl;
+    //         CloudStitcher cs(mProject.getPointCloud(num-2),
+    //                          mProject.getPointCloud(num-1),
+    //                          editor2->getArea1(),
+    //                          editor2->getArea2());
+    //         cs.stitch();
+    //         mProject.getPointCloud(num-1).transformation.setMatrix(
+    //             cs.getTransformation()
+    //         );
+    //         std::cout << "Done" << std::endl;
+    //         delete editor2;
+    //     }
+    // }
 }
 
 
 void MainWindow::loadProject() {
     mProject.clear();
-    std::string path = saveFileDialog("Load project");
+    std::string path = saveFileDialog(*this, "Load project");
     if (path != "") {
         std::ifstream file(path);
 
@@ -359,7 +306,7 @@ void MainWindow::loadProject() {
 }
 
 void MainWindow::saveProject() {
-    std::string path = saveFileDialog("Save project");
+    std::string path = saveFileDialog(*this, "Save project");
     if (path != "") {
         std::ofstream file(path);
         file << mProject.getNumModels();
@@ -375,9 +322,9 @@ void MainWindow::saveProject() {
                 << " " << model.transformation.rotation.w;
         }
 
-        file << mProject.getNumPointClouds();
-        for (size_t i=0; i<mProject.getNumPointClouds(); ++i) {
-            file << mProject.getPointCloud(i).getPath() << std::endl;
-        }
+        // file << mProject.getNumPointClouds();
+        // for (size_t i=0; i<mProject.getNumPointClouds(); ++i) {
+        //     file << mProject.getPointCloud(i).getPath() << std::endl;
+        // }
     }
 }

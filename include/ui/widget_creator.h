@@ -61,3 +61,65 @@ inline Gtk::ToolItem* createToolItem(
     item->add(*widget);
     return item;
 }
+
+
+inline std::string openFileDialog(
+    Gtk::Window& window,
+    const std::string& prompt
+) {
+    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_OPEN);
+    dialog.set_transient_for(window);
+
+    // Add response buttons the the dialog.
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Open", Gtk::RESPONSE_OK);
+
+    // Add filters.
+    Glib::RefPtr<Gtk::FileFilter> filter_any =
+        Gtk::FileFilter::create();
+    filter_any->set_name("Any files");
+    filter_any->add_pattern("*");
+    dialog.add_filter(filter_any);
+
+    int result = dialog.run();
+
+    switch(result) {
+    case(Gtk::RESPONSE_OK):
+        return dialog.get_filename();
+    case(Gtk::RESPONSE_CANCEL):
+    default:
+        return "";
+
+    }
+}
+
+
+inline std::string saveFileDialog(
+    Gtk::Window& window,
+    const std::string& prompt
+) {
+    Gtk::FileChooserDialog dialog(prompt, Gtk::FILE_CHOOSER_ACTION_SAVE);
+    dialog.set_transient_for(window);
+
+    // Add response buttons the the dialog.
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Save", Gtk::RESPONSE_OK);
+
+    // Add filters.
+    Glib::RefPtr<Gtk::FileFilter> filter_any =
+        Gtk::FileFilter::create();
+    filter_any->set_name("Any files");
+    filter_any->add_pattern("*");
+    dialog.add_filter(filter_any);
+
+    int result = dialog.run();
+
+    switch(result) {
+    case(Gtk::RESPONSE_OK):
+        return dialog.get_filename();
+    case(Gtk::RESPONSE_CANCEL):
+    default:
+        return "";
+
+    }
+}

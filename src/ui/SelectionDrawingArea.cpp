@@ -8,13 +8,16 @@
 
 
 SelectionDrawingArea::SelectionDrawingArea(
-    const std::string& imagePath,
+    const cv::Mat& image,
     int width, int height
 )
-    : mImage(Gdk::Pixbuf::create_from_file(imagePath)),
+    : // mImage(Gdk::Pixbuf::create_from_file(imagePath)),
       mWidth(width), mHeight(height),
       mLeftButton(false)
 {
+    cv::imwrite("tmp.jpg", image);
+    mImage = Gdk::Pixbuf::create_from_file("tmp.jpg");
+
     set_size_request(width, height);
     add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
                | Gdk::POINTER_MOTION_MASK);

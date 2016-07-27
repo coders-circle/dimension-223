@@ -16,13 +16,17 @@ public:
         return mFilename;
     }
 
+    float getFocalDistance() const { return mFocalDistance; }
+    float getDepthNear() const { return mDepthNear; }
+    float getDepthFar() const { return mDepthFar; }
+
 private:
     std::string mFilename;
 
     cv::Mat mImage;
     cv::Mat mDepth;
 
-    std::string mFocalDistance, mDepthNear, mDepthFar;
+    float mFocalDistance, mDepthNear, mDepthFar;
 
     std::string match(const std::string& tag, const std::string &src);
 

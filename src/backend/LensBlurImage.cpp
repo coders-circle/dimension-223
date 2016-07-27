@@ -18,9 +18,9 @@ LensBlurImage::LensBlurImage(const std::string& filename)
     std::string dmime = match("GDepth:Mime", src);
     std::string imime = match("GImage:Mime", src);
 
-    mFocalDistance = match("GFocus:FocalDistance", src);
-    mDepthNear = match("GDepth:Near", src);
-    mDepthFar = match("GDepth:Far", src);
+    mFocalDistance = stof(match("GFocus:FocalDistance", src));
+    mDepthNear = stof(match("GDepth:Near", src));
+    mDepthFar = stof(match("GDepth:Far", src));
 
     std::string depthFile = save("tmp_depth", depth, dmime);
     std::string imgFile = save("tmp_image", image, imime);

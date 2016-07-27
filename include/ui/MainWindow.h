@@ -33,15 +33,4 @@ private:
     void loadProject();
     void saveProject();
 
-    typedef std::pair<std::string, std::string> filter;
-
-    std::string openFileDialog(
-        const std::string& prompt = "Open",
-        const std::vector<filter> filters = std::vector<filter>()
-    );
-
-    std::string saveFileDialog(
-        const std::string& prompt = "Save",
-        const std::vector<filter> filters = std::vector<filter>()
-    );
 };

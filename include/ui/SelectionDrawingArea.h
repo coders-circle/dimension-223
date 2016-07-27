@@ -5,7 +5,7 @@
 class SelectionDrawingArea : public Gtk::DrawingArea
 {
 public:
-    SelectionDrawingArea(const std::string& mImagePath, int width, int height);
+    SelectionDrawingArea(const cv::Mat& image, int width, int height);
 
     const Area& getArea() const {
         return mArea;

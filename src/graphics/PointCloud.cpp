@@ -6,17 +6,16 @@ const int MAX_POINTS = 700;
 const int SKIP = 1;
 
 PointCloud::PointCloud(
-    const std::string& path,
+    const InputData& inputData,
     const std::vector<glm::ivec2>& floorPixels
 )
-    : mLensBlurImage(path),
-      // mFloorPixels(floorPixels),
-      mTexture(mLensBlurImage.getImage()),
+    : mInputData(inputData),
+      mTexture(mInputData.getImage()),
       mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
 {
 
     // Get the depth map and its size.
-    cv::Mat& depthMap = mLensBlurImage.getDepthMap();
+    cv::Mat& depthMap = mInputData.getDepthMap();
     int height = depthMap.rows;
     int width = depthMap.cols;
 
@@ -49,6 +48,11 @@ PointCloud::PointCloud(
     mPclCloud->is_dense = false;
     mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
 
+
+    // float ar = (float)width/(float)height;
+    // float far = mLensBlurImage.getDepthFar();
+    // float near = mLensBlurImage.getDepthNear();
+
     int tmp = 0;
     for (int i=0; i<height; i+=SKIP) {
         for (int j=0; j<width; j+=SKIP) {
@@ -57,10 +61,16 @@ PointCloud::PointCloud(
             float y = -i/(float)MAX_POINTS + 0.5f - yoffset;
             float depth = depthMap.at<cv::Vec3b>(i, j)[0];
 
+            float dd = depth * mInputData.getDepthScale();
+            // depth/5000 * (far*near)/(far - depth/5000 * (far-near));
+
+
             int index = i*width+j;
-            mPoints[index][0] = x * (1-depth/300);
-            mPoints[index][1] = y * (1-depth/300);
-            mPoints[index][2] = depth/300;
+
+            // TODO: Remove mPoints in favor of PclCloud.
+            mPoints[index][0] = x * (1-dd);
+            mPoints[index][1] = y * (1-dd);
+            mPoints[index][2] = dd;
 
             mImageCoordinates[index] = glm::ivec2(j, i);
 
@@ -84,8 +94,6 @@ PointCloud::PointCloud(
         }
     }
 
-    // mTriangleMesh = new btTriangleMesh();
-
     mIndices.resize((width/SKIP-1)*(height/SKIP-1)*6);
     tmp = 0;
     for (int i=0; i<height/SKIP-1; i++) {
@@ -98,24 +106,8 @@ PointCloud::PointCloud(
             mIndices[tmp++] = offset+1+width;
             mIndices[tmp++] = offset+width;
 
-            // mTriangleMesh->addTriangle(
-            //     glmToBullet(mPoints[offset]),
-            //     glmToBullet(mPoints[offset+1]),
-            //     glmToBullet(mPoints[offset+width])
-            // );
-            //
-            // mTriangleMesh->addTriangle(
-            //     glmToBullet(mPoints[offset+1]),
-            //     glmToBullet(mPoints[offset+1+width]),
-            //     glmToBullet(mPoints[offset+width])
-            // );
         }
     }
-
-    // Create the physics object.
-    // mTriangleMeshShape = new btBvhTriangleMeshShape(mTriangleMesh, false);
-    // mObject = new Object(this, mTriangleMeshShape, glm::vec3(0),
-    //     Object::STATIC);
 
     // Create the vertex and index buffer as well as vertex array
     // objects.

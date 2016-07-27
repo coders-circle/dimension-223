@@ -5,8 +5,8 @@
 
 class CloudPairEditor : public Gtk::Dialog {
 public:
-    CloudPairEditor(const std::string& image1, const std::string& image2)
-        : mImage1(cv::imread(image1)), mImage2(cv::imread(image2)),
+    CloudPairEditor(const cv::Mat& image1, const cv::Mat& image2)
+        : mImage1(image1), mImage2(image2),
           mArea1(image1, 550, 550*mImage1.rows/mImage1.cols),
           mArea2(image2, 550, 550*mImage2.rows/mImage2.cols),
           mBox(Gtk::ORIENTATION_HORIZONTAL, 5)
