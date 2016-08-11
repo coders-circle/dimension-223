@@ -5,9 +5,10 @@
 
 class InputDialog : public Gtk::Dialog {
 public:
-    InputDialog(const std::function<
-                    void(const InputData& inputData)
-                >& callback);
+    InputDialog(
+        Gtk::Window* parent,
+        const std::function<void(const InputData& inputData)>& callback
+    );
 
 private:
     Gtk::Grid mGrid;

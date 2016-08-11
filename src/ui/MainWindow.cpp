@@ -14,10 +14,11 @@ MainWindow::MainWindow(Project& project) :
     mViewport(WINDOW_WIDTH, WINDOW_HEIGHT),
     mRenderer(mViewport, project)
 {
+    set_title("Dimension-223");
     set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // Global box to contain all widgets.
-    Gtk::Box* vbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL, 0));
+    Gtk::Box* vbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
     add(*vbox);
 
     // Menubar.
@@ -44,14 +45,57 @@ MainWindow::MainWindow(Project& project) :
     });
     mRenderer.setSelectionChangedCallback([this](size_t selection)
     {
-        changeSelection(selection);
+        changeSelection(MODEL, selection);
     });
+
+    Gtk::Box* hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 0));
+    vbox->add(*hbox);
+
+    Gtk::Box* panelLeft = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL, 0));
+    hbox->add(*panelLeft);
+
+    panelLeft->add(*Gtk::manage(new Gtk::Label("Point Clouds: ")));
+    mPointCloudList = Gtk::manage(new Gtk::ListViewText(1));
+    mPointCloudList->set_size_request(200, 300);
+    mPointCloudList->get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
+    panelLeft->add(*mPointCloudList);
+
+    mPointCloudList->set_headers_visible(false);
+    mPointCloudList->set_activate_on_single_click(true);
+    mPointCloudList->signal_row_activated().connect(
+        [this](const Gtk::TreeModel::Path& path,
+               Gtk::TreeViewColumn* column)
+    {
+        auto selected = mPointCloudList->get_selected();
+        if (selected.size() > 0) {
+            changeSelection(POINTCLOUD, selected[0]);
+        }
+    });
+
+    Gtk::Button* editPcBtn = Gtk::manage(new Gtk::Button("Edit"));
+    editPcBtn->signal_clicked().connect([this](){
+        auto selected = mPointCloudList->get_selected();
+        if (selected.size() > 0) {
+            editPointCloud(selected[0]);
+        }
+    });
+    panelLeft->add(*editPcBtn);
+
+    Gtk::Button* stitchBtn = Gtk::manage(new Gtk::Button("Stitch"));
+    stitchBtn->signal_clicked().connect([this](){
+        auto selected = mPointCloudList->get_selected();
+        if (selected.size() >= 2) {
+            stitch(selected[0], selected[1]);
+        }
+    });
+    panelLeft->add(*stitchBtn);
 
     // Show and add the viewport to the window.
     mViewport.show();
     mViewport.set_hexpand(true);
     mViewport.set_vexpand(true);
-    vbox->add(mViewport);
+    hbox->add(mViewport);
+
     vbox->add(*toolbar);
 
     vbox->show_all();
@@ -72,10 +116,12 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
     menuitem_file->set_submenu(*fileMenu);
 
     fileMenu->append(*createMenuItem("_New Project", [this]() {
+        mPointCloudList->clear_items();
         mProject.clear();
     }, Accelerator('N', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
 
     fileMenu->append(*createMenuItem("_Load Project", [this]() {
+        mPointCloudList->clear_items();
         loadProject();
     }, Accelerator('O', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
 
@@ -97,7 +143,7 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
     editMenu->append(*createMenuItem("_Add Model", [this]() {
         addModel();
     }));
-    editMenu->append(*createMenuItem("_Add Lensblur Model", [this]() {
+    editMenu->append(*createMenuItem("_Add Point Cloud", [this]() {
         addPointCloud();
     }));
 }
@@ -134,7 +180,7 @@ void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
     toolbar->append(*createToolItem(
         Gtk::manage(new Gtk::Label("Scale: ")))
     );
-    for (int i=0; i<3; ++i) {
+    for (int i=0; i</*3*/1; ++i) {
         mScales[i] = createSpinEntry(0.0001, 4, 10);
         mScales[i]->signal_value_changed().connect([this](){
             updateSelection();
@@ -152,13 +198,7 @@ void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
     toolbar->append(*createToolItem(mDynamicButton));
 }
 
-
-void MainWindow::changeSelection(size_t selection) {
-    mChanging = true;
-    mSelection = selection;
-    Model& model = mProject.getModel(selection);
-    Transformation& t = model.transformation;
-
+void MainWindow::setTransformation(Transformation& t) {
     for (int i=0; i<3; ++i)
         mTranslations[i]->set_value(t.position[i]);
 
@@ -166,41 +206,66 @@ void MainWindow::changeSelection(size_t selection) {
     for (int i=0; i<3; ++i)
         mRotations[i]->set_value(angles[i]);
 
-    for (int i=0; i<3; ++i)
+    for (int i=0; i</*3*/1; ++i)
         mScales[i]->set_value(t.scale[i]);
+
+}
+void MainWindow::updateTransformation(Transformation& t) {
+    for (int i=0; i<3; ++i) {
+        float val = mTranslations[i]->get_value();
+        t.position[i] = val;
+    }
+
+    glm::vec3 angles;
+    for (int i=0; i<3; ++i) {
+        float val = mRotations[i]->get_value();
+        angles[i] = val;
+    }
+    t.rotation = glm::quat(glm::radians(angles));
+
+    for (int i=0; i<3; ++i) {
+        float val = mScales[/*i*/0]->get_value();
+        t.scale[i] = val;
+    }
+}
+
+void MainWindow::changeSelection(SELECTION_TYPE type, size_t selection) {
+    mChanging = true;
+    mSelectionType = type;
+    mSelection = selection;
+
+    if (type == MODEL) {
+        Model& model = mProject.getModel(selection);
+        setTransformation(model.transformation);
+    }
+    else if (type == POINTCLOUD) {
+        PointCloud& pc = mProject.getPointCloud(selection);
+        setTransformation(pc.transformation);
+    }
     mChanging = false;
 }
 
 void MainWindow::updateSelection() {
     if (!mChanging && mSelection < mProject.getNumModels()) {
-        Model& model = mProject.getModel(mSelection);
-        Transformation& t = model.transformation;
 
-        for (int i=0; i<3; ++i) {
-            float val = mTranslations[i]->get_value();
-            t.position[i] = val;
+        if (mSelectionType == MODEL) {
+            Model& model = mProject.getModel(mSelection);
+            updateTransformation(model.transformation);
+
+            model.transform();
+
+            auto object = model.getObject();
+            bool state = mDynamicButton->get_active();
+            if (object->isDynamic() != state) {
+                mProject.getPhysicsWorld().remove(*object);
+                model.getObject()->setDynamic(state);
+                mProject.getPhysicsWorld().add(*object);
+            }
         }
 
-        glm::vec3 angles;
-        for (int i=0; i<3; ++i) {
-            float val = mRotations[i]->get_value();
-            angles[i] = val;
-        }
-        t.rotation = glm::quat(glm::radians(angles));
-
-        for (int i=0; i<3; ++i) {
-            float val = mScales[i]->get_value();
-            t.scale[i] = val;
-        }
-
-        model.transform();
-
-        auto object = model.getObject();
-        bool state = mDynamicButton->get_active();
-        if (object->isDynamic() != state) {
-            mProject.getPhysicsWorld().remove(*object);
-            model.getObject()->setDynamic(state);
-            mProject.getPhysicsWorld().add(*object);
+        else if (mSelectionType == POINTCLOUD) {
+            PointCloud&  pc = mProject.getPointCloud(mSelection);
+            updateTransformation(pc.transformation);
         }
     }
 }
@@ -218,59 +283,39 @@ void MainWindow::addModel() {
 void MainWindow::addPointCloud() {
 
     InputDialog inputDialog(
+        this,
         [this] (const InputData& inputData) {
-            std::vector<glm::ivec2> points;
-            mProject.addPointCloud(inputData, points);
+            size_t index = mProject.addPointCloud(inputData);
+            mPointCloudList->append("Point Cloud #" + std::to_string(index));
         }
     );
-
-    inputDialog.set_transient_for(*this);
     inputDialog.run();
     inputDialog.hide();
+}
 
-    // std::string path = openFileDialog(*this, "Load Lens Blur Image");
-    // if (path != "") {
-    //     // First open the image in separate window for surface drawing.
-    //     SurfaceEditor* editor = new SurfaceEditor(path);
-    //     editor->set_transient_for(*this);
-    //     editor->run();
-    //     editor->hide();
+void MainWindow::editPointCloud(size_t index) {
+    PointCloud& pc = mProject.getPointCloud(index);
+    SurfaceEditor editor(this, pc);
+    editor.run();
+    editor.hide();
+    pc.reconstruct();
+}
 
-    //     // Next add as the point cloud.
-    //     LensBlurImage lbi(path);
-    //     mProject.addPointCloud(
-    //         InputData(lbi.getImage(), lbi.getDepthMap()),
-    //         editor->getPoints()
-    //     );
-    //     delete editor;
+void MainWindow::stitch(size_t index0, size_t index1) {
+    PointCloud& pc1 = mProject.getPointCloud(index0);
+    PointCloud& pc2 = mProject.getPointCloud(index1);
+    CloudStitcher stitcher(
+        pc1, pc2,
+        Area(0, pc1.getInputData().getImage().cols, 0,
+             pc1.getInputData().getImage().rows),
+        Area(0, pc2.getInputData().getImage().cols, 0,
+             pc2.getInputData().getImage().rows)
+    );
 
-    //     // Next if this is second point cloud, open two images as pairs
-    //     // for intersection area selection.
-    //     size_t num = mProject.getNumPointClouds();
-    //     if (num > 1) {
-    //         CloudPairEditor* editor2 = new CloudPairEditor(
-    //             mProject.getPointCloud(num-2).getInputData().getImage(),
-    //             cv::imread(path)
-    //         );
-    //         editor2->set_transient_for(*this);
-    //         editor2->run();
-    //         editor2->hide();
-    //         mProject.addIntersection(num-2, editor2->getArea2(),
-    //                                  editor2->getArea1());
-
-    //         std::cout << "Stitching" << std::endl;
-    //         CloudStitcher cs(mProject.getPointCloud(num-2),
-    //                          mProject.getPointCloud(num-1),
-    //                          editor2->getArea1(),
-    //                          editor2->getArea2());
-    //         cs.stitch();
-    //         mProject.getPointCloud(num-1).transformation.setMatrix(
-    //             cs.getTransformation()
-    //         );
-    //         std::cout << "Done" << std::endl;
-    //         delete editor2;
-    //     }
-    // }
+    std::cout << "stitching" << std::endl;
+    stitcher.stitch();
+    pc2.transformation.setMatrix(stitcher.getTransformation());
+    std::cout << "done" << std::endl;
 }
 
 

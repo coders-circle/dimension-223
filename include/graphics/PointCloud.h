@@ -1,8 +1,9 @@
 #pragma once
 #include <backend/InputData.h>
+#include <backend/Surface.h>
+
 #include <graphics/Mesh.h>
 #include <graphics/Transformation.h>
-#include <physics/Object.h>
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -11,8 +12,17 @@
 
 class PointCloud {
 public:
-    PointCloud(const InputData& inputData,
-               const std::vector<glm::ivec2>& floorPixels);
+    PointCloud(const InputData& inputData);
+
+    void setSurfaces(const std::vector<Surface>& surfaces) {
+        mSurfaces = surfaces;
+    }
+
+    std::vector<Surface>& getSurfaces() {
+        return mSurfaces;
+    }
+
+    void reconstruct();
 
     std::vector<glm::vec3>& getPoints() { return mPoints; }
 
@@ -43,6 +53,7 @@ public:
 
 private:
     InputData mInputData;
+    bool mConstructed;
 
     std::vector<glm::vec3> mPoints;
     std::vector<glm::ivec2> mImageCoordinates;
@@ -53,4 +64,6 @@ private:
     Texture mTexture;
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud;
+
+    std::vector<Surface> mSurfaces;
 };

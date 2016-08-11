@@ -8,13 +8,17 @@
 
 
 SurfaceDrawingArea::SurfaceDrawingArea(
-    const std::string& imagePath,
-    int width, int height
+    const cv::Mat& image,
+    int width, int height,
+    std::vector<Surface>& surfaces
 )
-    : mImage(Gdk::Pixbuf::create_from_file(imagePath)),
+    : mSurfaces(surfaces),
       mWidth(width), mHeight(height),
       mLeftButton(false), mRightButton(false)
 {
+    cv::imwrite("tmp.jpg", image);
+    mImage = Gdk::Pixbuf::create_from_file("tmp.jpg");
+
     set_size_request(width, height);
     add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
                | Gdk::POINTER_MOTION_MASK);
@@ -28,10 +32,18 @@ bool SurfaceDrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->paint();
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.6);
-    for (size_t i=0; i<mPoints.size(); ++i) {
-      glm::ivec2& p = mPoints[i];
-      cr->arc(p.x, p.y, 16.0, 0.0, 2 * M_PI);
-      cr->fill();
+
+    if (mSurfaces.size() > mSelection) {
+        for (int i=0; i<mHeight; ++i) {
+            for (int j=0; j<mWidth; ++j) {
+                auto& surface = mSurfaces[mSelection];
+                if (surface.marked[i*mWidth + j]) {
+                    // cr->arc(j, i, 24.0, 0.0, 2 * M_PI);
+                    cr->rectangle(j, i, 1, 1);
+                    cr->fill();
+                }
+            }
+        }
     }
     return false;
 }
@@ -53,20 +65,40 @@ bool SurfaceDrawingArea::on_button_release_event(GdkEventButton* event) {
 }
 
 bool SurfaceDrawingArea::on_motion_notify_event(GdkEventMotion* event) {
+    int ex = (int)event->x;
+    int ey = (int)event->y;
+
     if (mLeftButton) {
-        mPoints.push_back(glm::ivec2(event->x, event->y));
+        if (mSelection < mSurfaces.size()
+            && ey >= 0 && ey < mHeight
+            && ex >= 0 && ex < mWidth)
+        {
+            for (int i = glm::max(0, ey-24);
+                 i < glm::min(mHeight, ey+24); ++i)
+            {
+                for (int j = glm::max(0, ex-24);
+                     j < glm::min(mWidth, ex+24); ++j)
+                {
+                    mSurfaces[mSelection].marked[i*mWidth+j] = true;
+                }
+            }
+            
+        }
         queue_draw();
     }
     if (mRightButton) {
-        for (auto it=mPoints.begin(); it!=mPoints.end(); )
+        if (mSelection < mSurfaces.size()
+            && ey >=0 && ey < mHeight
+            && ex >=0 && ex < mWidth)
         {
-            if(glm::abs(it->x - event->x) < 16 &&
-               glm::abs(it->y - event->y) < 16)
+            for (int i = glm::max(0, ey-24);
+                 i < glm::min(mHeight, ey+24); ++i)
             {
-                it = mPoints.erase(it);
-            }
-            else {
-                ++it;
+                for (int j = glm::max(0, ex-24);
+                     j < glm::min(mWidth, ex+24); ++j)
+                {
+                    mSurfaces[mSelection].marked[i*mWidth+j] = false;
+                }
             }
         }
         queue_draw();

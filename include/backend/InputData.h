@@ -14,6 +14,8 @@ public:
     cv::Mat& getDepthMap() { return mDepthMap; }
     float getDepthScale() { return mDepthScale; }
 
+    const cv::Mat& getImage() const { return mImage; }
+    const cv::Mat& getDepthMap() const { return mDepthMap; }
 
 private:
     cv::Mat mImage;

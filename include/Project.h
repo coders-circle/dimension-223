@@ -5,12 +5,6 @@
 #include <physics/World.h>
 
 
-struct CloudIntersection {
-    size_t otherPointCloud;
-    Area myArea, otherArea;
-};
-
-
 /**
  * The repository for project data representing an project state. This data is
  * used for saving and loading.
@@ -40,12 +34,9 @@ public:
         return mModels.size();
     }
 
-    size_t addPointCloud(
-        const InputData& inputData,
-        const std::vector<glm::ivec2>& points
-    ) {
+    size_t addPointCloud(const InputData& inputData) {
         try {
-            mPointClouds.push_back(PointCloud(inputData, points));
+            mPointClouds.push_back(PointCloud(inputData));
             size_t index = mPointClouds.size() - 1;
             return index;
         }
@@ -63,25 +54,6 @@ public:
         return mPointClouds.size();
     }
 
-    size_t addIntersection(size_t other, const Area& myArea,
-                           const Area& otherArea)
-    {
-        CloudIntersection intersection;
-        intersection.otherPointCloud = other;
-        intersection.myArea = myArea;
-        intersection.otherArea = otherArea;
-        mIntersections.push_back(intersection);
-        return mIntersections.size()-1;
-    }
-
-    CloudIntersection& getIntersection(size_t index) {
-        return mIntersections[index];
-    }
-
-    size_t getNumIntersections() const {
-        return mIntersections.size();
-    }
-
     void clear() {
         for (auto& m: mModels)
             m.destroy();
@@ -89,7 +61,6 @@ public:
             p.destroy();
         mModels.clear();
         mPointClouds.clear();
-        mIntersections.clear();
     }
 
     World& getPhysicsWorld() { return mPhysicsWorld; }
@@ -100,8 +71,4 @@ private:
     std::vector<PointCloud> mPointClouds;
     World mPhysicsWorld;
     Camera mCamera;
-
-    // For each point cloud except the first, store intersection
-    // areas for it and the other point cloud.
-    std::vector<CloudIntersection> mIntersections;
 };

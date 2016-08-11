@@ -16,9 +16,12 @@ inline void setViewImage(Gtk::Image* view, cv::Mat& image) {
 
 
 InputDialog::InputDialog(
+    Gtk::Window* parent,
     const std::function<void(const InputData& inputData)>& callback
 )
 {
+    set_title("Add Point Cloud");
+    set_transient_for(*parent);
     get_content_area()->add(mGrid);
 
     mImageView = Gtk::manage(new Gtk::Image());

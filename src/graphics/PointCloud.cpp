@@ -6,33 +6,29 @@ const int MAX_POINTS = 700;
 const int SKIP = 1;
 
 PointCloud::PointCloud(
-    const InputData& inputData,
-    const std::vector<glm::ivec2>& floorPixels
+    const InputData& inputData
 )
     : mInputData(inputData),
+      mConstructed(false),
       mTexture(mInputData.getImage()),
       mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
 {
+    mSurfaces.clear();
+    reconstruct();
+}
+
+
+void PointCloud::reconstruct() {
+    if (mConstructed) {
+        destroy();
+    }
+    else
+        mConstructed = true;
 
     // Get the depth map and its size.
     cv::Mat& depthMap = mInputData.getDepthMap();
     int height = depthMap.rows;
     int width = depthMap.cols;
-
-    // Get the floor vertices.
-    std::vector<bool> floorPoints(width*height, false);
-    for (size_t i=0; i<floorPixels.size(); ++i) {
-        const glm::ivec2& p = floorPixels[i];
-        for (int x = glm::max(0, p.x-16); x < glm::min(width, p.x+16); ++x) {
-            for (int y = glm::max(0, p.y-16); y < glm::min(height, p.y+16);
-                 ++y)
-            {
-                floorPoints[y*width + x] = true;
-            }
-        }
-    }
-
-    float floorY = -9999;
 
     // Get (x, y) coordinate of the first point.
     float xoffset = float(MAX_POINTS - width)/2.0f / MAX_POINTS;
@@ -47,7 +43,6 @@ PointCloud::PointCloud(
     mPclCloud->height = height/SKIP;
     mPclCloud->is_dense = false;
     mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
-
 
     // float ar = (float)width/(float)height;
     // float far = mLensBlurImage.getDepthFar();
@@ -72,19 +67,22 @@ PointCloud::PointCloud(
             mPoints[index][1] = y * (1-dd);
             mPoints[index][2] = dd;
 
+            // Check for surface points.
+            for (auto& surface: mSurfaces) {
+                if (surface.marked[index]) {
+                    if (surface.y == -9999999)
+                        surface.y = mPoints[index][1];
+                    else
+                        mPoints[index][1] = surface.y;
+                }
+            }
+
             mImageCoordinates[index] = glm::ivec2(j, i);
 
             mPclCloud->points[index].x = mPoints[index][0];
             mPclCloud->points[index].y = mPoints[index][1];
             mPclCloud->points[index].z = mPoints[index][2];
 
-            // Check if a floor point.
-            if (floorPoints[index]) {
-                if (floorY == -9999)
-                    floorY = mPoints[index][1];
-                else
-                    mPoints[index][1] = floorY;
-            }
 
             mVertices[tmp++] = mPoints[index][0];
             mVertices[tmp++] = mPoints[index][1];
@@ -155,6 +153,6 @@ void PointCloud::draw(const Program& program,
     glBindVertexArray(mVao);
     // glDrawArrays(GL_POINTS, 0, mVertices.size());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
-    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
 }

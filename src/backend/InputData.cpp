@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdinc.h>
 #include <backend/InputData.h>
 
