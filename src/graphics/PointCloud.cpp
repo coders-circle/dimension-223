@@ -10,8 +10,8 @@ PointCloud::PointCloud(
 )
     : mInputData(inputData),
       mConstructed(false),
-      mTexture(mInputData.getImage()),
-      mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
+      mTexture(mInputData.getImage())
+      // mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
 {
     mSurfaces.clear();
     reconstruct();
@@ -39,10 +39,10 @@ void PointCloud::reconstruct() {
     mPoints.resize(width*height/SKIP/SKIP);
     mImageCoordinates.resize(width*height/SKIP/SKIP);
 
-    mPclCloud->width = width/SKIP;
-    mPclCloud->height = height/SKIP;
-    mPclCloud->is_dense = false;
-    mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
+    // mPclCloud->width = width/SKIP;
+    // mPclCloud->height = height/SKIP;
+    // mPclCloud->is_dense = false;
+    // mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
 
     // float ar = (float)width/(float)height;
     // float far = mLensBlurImage.getDepthFar();
@@ -79,9 +79,9 @@ void PointCloud::reconstruct() {
 
             mImageCoordinates[index] = glm::ivec2(j, i);
 
-            mPclCloud->points[index].x = mPoints[index][0];
-            mPclCloud->points[index].y = mPoints[index][1];
-            mPclCloud->points[index].z = mPoints[index][2];
+            // mPclCloud->points[index].x = mPoints[index][0];
+            // mPclCloud->points[index].y = mPoints[index][1];
+            // mPclCloud->points[index].z = mPoints[index][2];
 
 
             mVertices[tmp++] = mPoints[index][0];

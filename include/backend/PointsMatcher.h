@@ -17,13 +17,13 @@ public:
         return mWidth2;
     }
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud1() {
-        return mPclCloud1;
-    }
-
-    pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud2() {
-        return mPclCloud2;
-    }
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud1() {
+    //     return mPclCloud1;
+    // }
+    //
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud2() {
+    //     return mPclCloud2;
+    // }
 
 private:
     PointCloud& mPointCloud1;
@@ -34,9 +34,9 @@ private:
 
     std::vector<glm::vec3> mPoints1;
     std::vector<glm::vec3> mPoints2;
-    
-    pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud1;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud2;
+    //
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud1;
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud2;
 
     int mWidth1, mWidth2;
 };

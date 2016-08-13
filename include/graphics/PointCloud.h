@@ -5,9 +5,9 @@
 #include <graphics/Mesh.h>
 #include <graphics/Transformation.h>
 
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-#include <pcl/registration/icp.h>
+// #include <pcl/io/pcd_io.h>
+// #include <pcl/point_types.h>
+// #include <pcl/registration/icp.h>
 
 
 class PointCloud {
@@ -47,9 +47,9 @@ public:
 
     Transformation transformation;
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud() {
-        return mPclCloud;
-    }
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud() {
+    //     return mPclCloud;
+    // }
 
 private:
     InputData mInputData;
@@ -63,7 +63,7 @@ private:
     GLuint mVbo, mIbo, mVao;
     Texture mTexture;
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud;
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud;
 
     std::vector<Surface> mSurfaces;
 };
