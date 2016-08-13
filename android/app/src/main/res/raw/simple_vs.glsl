@@ -1,7 +1,11 @@
-attribute vec4 a_Position;
+attribute vec3 position;
+attribute vec2 texcoords;
 
-uniform mat4 u_MVP;
+uniform mat4 mvp;
+
+varying vec2 fTexcoords;
 
 void main() {
-    gl_Position = u_MVP * a_Position;
+    gl_Position = mvp * vec4(position, 1.0);
+    fTexcoords = texcoords;
 }

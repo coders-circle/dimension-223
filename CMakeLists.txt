@@ -24,9 +24,10 @@ link_directories(${GTKMM_LIBRARY_DIRS})
 
 add_definitions(
     -Wno-deprecated-declarations
+    -pthread
 )
 
-target_link_libraries(d223 ${OpenCV_LIBS} ${BULLET_LIBRARIES} ${GTKMM_LIBRARIES} GL GLEW sfml-system sfml-window sfml-graphics SOIL assimp)
+target_link_libraries(d223 ${OpenCV_LIBS} ${BULLET_LIBRARIES} ${GTKMM_LIBRARIES} GL GLEW sfml-system sfml-window sfml-graphics SOIL assimp pthread)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

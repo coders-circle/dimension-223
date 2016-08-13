@@ -51,6 +51,9 @@ public:
     //     return mPclCloud;
     // }
 
+    std::vector<float>& getVertices() { return mVertices; }
+    std::vector<GLuint>& getIndices() { return mIndices; }
+
 private:
     InputData mInputData;
     bool mConstructed;

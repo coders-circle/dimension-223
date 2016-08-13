@@ -10,7 +10,6 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loadSource;
     private static final int REQUEST_CODE = 100;
 
     @Override
@@ -18,20 +17,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        loadSource = (Button) findViewById(R.id.source_button);
-        loadSource.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                intent.setType("image/*");
-//                startActivityForResult(Intent.createChooser(intent, "Open folder"),REQUEST_CODE);
+        Button loadSource = (Button) findViewById(R.id.source_button);
+        if (loadSource != null)
+            loadSource.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+    //                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    //                intent.setType("image/*");
+    //                startActivityForResult(Intent.createChooser(intent, "Open folder"),REQUEST_CODE);
+                    Intent vrIntent = new Intent(MainActivity.this, VRActivity.class);
+                    startActivity(vrIntent);
+                }
+            });
 
-                Intent vrIntent = new Intent(MainActivity.this, VRActivity.class);
-                startActivity(vrIntent);
-            }
-        });
 
+
+        Button loadWifi = (Button) findViewById(R.id.wifi_button);
+        if (loadWifi != null) {
+            loadWifi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    StreamLoader loader = new StreamLoader(MainActivity.this, "192.168.100.12", 1234);
+                    loader.execute();
+                }
+            });
+        }
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE){

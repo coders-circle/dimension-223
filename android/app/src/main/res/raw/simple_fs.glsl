@@ -1,5 +1,9 @@
 precision mediump float;
 
+varying vec2 fTexcoords;
+
+uniform sampler2D uTexture;
+
 void main() {
-    gl_FragColor = vec4(1, 0, 0, 1);
+    gl_FragColor = texture2D(uTexture, fTexcoords);
 }

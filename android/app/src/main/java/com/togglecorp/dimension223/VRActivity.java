@@ -13,10 +13,14 @@ import com.google.vr.sdk.base.Viewport;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
 public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
+
+    public static List<PointCloud> pointsClouds = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,12 +38,6 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
     private float[] mModelViewProjection = new float[16];
     private float[] mModelCube = new float[16];
 
-    private FloatBuffer mVertexBuffer;
-
-    private float[] mVertices = new float[] {
-      -2, 0, 0, 2, 0, 0, 1, 1, 0
-    };
-
     private int mProgram;
 
     @Override
@@ -47,10 +45,10 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
         headTransform.getHeadView(mHeadView, 0);
 
         // Build the Model part of the ModelView matrix.
-        Matrix.rotateM(mModelCube, 0, 0.3f, 0, 0, 1);
+//        Matrix.rotateM(mModelCube, 0, 0.3f, 0, 0, 1);
 
         // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(mCamera, 0, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mCamera, 0, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
     }
 
     @Override
@@ -69,13 +67,8 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
 
         GLES20.glUseProgram(mProgram);
 
-        int mvp = GLES20.glGetUniformLocation(mProgram, "u_MVP");
-        int posAttr = GLES20.glGetAttribLocation(mProgram, "a_Position");
-        GLES20.glUniformMatrix4fv(mvp, 1, false, mModelViewProjection, 0);
-        GLES20.glVertexAttribPointer(posAttr, 3, GLES20.GL_FLOAT,
-                false, 0, mVertexBuffer);
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        for (PointCloud pc: pointsClouds)
+            pc.draw(mProgram, mModelViewProjection);
     }
 
     @Override
@@ -102,11 +95,8 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
         GLES20.glAttachShader(mProgram, fragmentShader);
         GLES20.glLinkProgram(mProgram);
 
-        ByteBuffer bbVertices = ByteBuffer.allocateDirect(mVertices.length * 4);
-        bbVertices.order(ByteOrder.nativeOrder());
-        mVertexBuffer = bbVertices.asFloatBuffer();
-        mVertexBuffer.put(mVertices);
-        mVertexBuffer.position(0);
+        for (PointCloud pc: pointsClouds)
+            pc.load();
     }
 
     @Override

@@ -129,6 +129,10 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
         saveProject();
     }, Accelerator('S', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
 
+    fileMenu->append(*createMenuItem("_Export to VR", [this]() {
+        exportToVr();
+    }));
+
     fileMenu->append(*createMenuItem("_Quit", [this]() {
         hide();
     }, Accelerator('Q', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
@@ -372,4 +376,12 @@ void MainWindow::saveProject() {
         //     file << mProject.getPointCloud(i).getPath() << std::endl;
         // }
     }
+}
+
+
+#include <ui/ProjectStreamer.h>
+void MainWindow::exportToVr() {
+    ProjectStreamer streamer(this, mProject);
+    streamer.run();
+    streamer.hide();
 }

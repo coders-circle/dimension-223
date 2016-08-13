@@ -41,4 +41,6 @@ private:
 
     void editPointCloud(size_t index);
     void stitch(size_t index0, size_t index1);
+
+    void exportToVr();
 };
