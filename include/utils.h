@@ -80,3 +80,5 @@ inline std::ostream& operator << (std::ostream& out, const glm::vec3& v) {
     out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
     return out;
 }
+
+void blur(std::vector<glm::vec3>& points, int width, int height);

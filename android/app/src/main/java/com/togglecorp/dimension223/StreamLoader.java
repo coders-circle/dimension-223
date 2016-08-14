@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StreamLoader extends AsyncTask<Void, Void, Void> {
     private String ip;

@@ -59,13 +59,21 @@ void PointCloud::reconstruct() {
             float dd = depth * mInputData.getDepthScale();
             // depth/5000 * (far*near)/(far - depth/5000 * (far-near));
 
-
             int index = i*width+j;
 
             // TODO: Remove mPoints in favor of PclCloud.
             mPoints[index][0] = x * (1-dd);
             mPoints[index][1] = y * (1-dd);
             mPoints[index][2] = dd;
+        }
+    }
+
+    blur(mPoints, width, height);
+
+    for (int i=0; i<height; i+=SKIP) {
+        for (int j=0; j<width; j+=SKIP) {
+
+            int index = i*width+j;
 
             // Check for surface points.
             for (auto& surface: mSurfaces) {

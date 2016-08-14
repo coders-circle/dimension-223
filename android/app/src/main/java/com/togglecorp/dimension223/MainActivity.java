@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button loadSource = (Button) findViewById(R.id.source_button);
+        final Button loadSource = (Button) findViewById(R.id.source_button);
         if (loadSource != null)
             loadSource.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -30,15 +32,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.INVISIBLE);
 
-
-        Button loadWifi = (Button) findViewById(R.id.wifi_button);
+        final Button loadWifi = (Button) findViewById(R.id.wifi_button);
         if (loadWifi != null) {
             loadWifi.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    StreamLoader loader = new StreamLoader(MainActivity.this, "192.168.100.12", 1234);
+                    progressBar.setVisibility(View.VISIBLE);
+                    loadSource.setVisibility(View.INVISIBLE);
+                    loadWifi.setVisibility(View.INVISIBLE);
+
+                    EditText ipEdit = (EditText)findViewById(R.id.edit_ip);
+                    StreamLoader loader = new StreamLoader(MainActivity.this, ipEdit.getText().toString(), 1234);
                     loader.execute();
+
+                    ipEdit.setVisibility(View.INVISIBLE);
                 }
             });
         }

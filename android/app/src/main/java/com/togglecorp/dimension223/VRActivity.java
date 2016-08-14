@@ -48,7 +48,7 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
 //        Matrix.rotateM(mModelCube, 0, 0.3f, 0, 0, 1);
 
         // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(mCamera, 0, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mCamera, 0, 0.0f, 0.023f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
 
         // Build the ModelView and ModelViewProjection matrices
         // for calculating cube position and light.
-        float[] perspective = eye.getPerspective(0.1f, 1000.0f);
+        float[] perspective = eye.getPerspective(0.0001f, 10000.0f);
         Matrix.multiplyMM(mModelView, 0, mView, 0, mModelCube, 0);
         Matrix.multiplyMM(mModelViewProjection, 0, perspective, 0, mModelView, 0);
 
