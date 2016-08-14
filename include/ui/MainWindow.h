@@ -1,6 +1,5 @@
 #pragma once
 #include <gtkmm.h>
-#include <ui/SFMLWidget.h>
 #include <graphics/Renderer.h>
 
 /**
@@ -15,7 +14,7 @@ public:
 private:
     Project& mProject;
 
-    SFMLWidget mViewport;
+    GlxWidget mViewport;
     Renderer mRenderer;
 
     void addMenuItems(Gtk::MenuBar* menuBar);

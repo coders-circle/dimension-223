@@ -3,7 +3,7 @@
 #include <backend/LensBlurImage.h>
 
 
-Renderer::Renderer(SFMLWidget& viewport, Project& project)
+Renderer::Renderer(GlxWidget& viewport, Project& project)
     : mViewport(viewport), mProject(project), mInputHandler(project)
 {}
 

@@ -2,7 +2,7 @@
 #include <backend/CloudStitcher.h>
 
 #include <Project.h>
-#include <ui/SFMLWidget.h>
+#include <ui/GlxWidget.h>
 
 #include <physics/World.h>
 #include <graphics/InputHandler.h>
@@ -19,7 +19,7 @@
  */
 class Renderer {
 public:
-    Renderer(SFMLWidget& viewport, Project& project);
+    Renderer(GlxWidget& viewport, Project& project);
 
     ~Renderer() {
         finish();
@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    SFMLWidget& mViewport;
+    GlxWidget& mViewport;
     Project& mProject;
 
     Program* mSimpleProgram;

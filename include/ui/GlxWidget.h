@@ -1,34 +1,31 @@
 #pragma once
 
+#include <gtkmm/widget.h>
+#include <gdk/gdkx.h>
+#include <X11/Xlib.h>
+
+#include <GL/glx.h>
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <SFML/OpenGL.hpp>
-#include <SFML/Graphics.hpp>
-#include <gtkmm/widget.h>
 
 
 /**
- * A Gtk Widget that wraps an SFML renderer. It basically acts as
+ * A Gtk Widget that wraps GLX. It basically acts as
  * OpenGL widget for Gtk+.
  */
-class SFMLWidget : public Gtk::Widget {
+class GlxWidget : public Gtk::Widget {
 public:
     /**
-     * The internal SFML window where stuffs can be rendered.
-     */
-    sf::RenderWindow renderWindow;
-
-    /**
-     * Construct a new SFML widget with given size.
+     * Construct a new GlxWidget widget with given size.
      * @param width Initial width of render window.
      * @param height Initial height of render window.
      */
-    SFMLWidget(int width, int height);
+    GlxWidget(int width, int height);
 
     /**
-     * Destroy the internal SFML window along with the GTK widget.
+     * Destroy the internal GlxWidget window along with the GTK widget.
      */
-    virtual ~SFMLWidget();
+    virtual ~GlxWidget();
 
     /**
      * Invalidate the widget so it will draw itself next when it gets a chance.
@@ -90,4 +87,9 @@ protected:
     std::function<void()> mDraw;
     std::function<void(int, int)> mResize;
     std::function<void()> mInit;
+
+    // X11 dn GLX stuffs.
+    Display *xd;
+    XVisualInfo *xvi;
+    GLXContext glxc;
 };

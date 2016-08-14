@@ -27,7 +27,7 @@ add_definitions(
     -pthread
 )
 
-target_link_libraries(d223 ${OpenCV_LIBS} ${BULLET_LIBRARIES} ${GTKMM_LIBRARIES} GL GLEW sfml-system sfml-window sfml-graphics SOIL assimp pthread)
+target_link_libraries(d223 ${OpenCV_LIBS} ${BULLET_LIBRARIES} ${GTKMM_LIBRARIES} GL GLEW X11 SOIL assimp pthread)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

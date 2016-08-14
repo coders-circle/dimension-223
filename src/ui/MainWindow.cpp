@@ -100,8 +100,6 @@ MainWindow::MainWindow(Project& project) :
 
     vbox->show_all();
 
-    glewInit();
-
     maximize();
 }
 
