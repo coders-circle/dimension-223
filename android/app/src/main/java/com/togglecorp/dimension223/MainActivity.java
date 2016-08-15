@@ -20,38 +20,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final Button loadSource = (Button) findViewById(R.id.source_button);
-        if (loadSource != null)
-            loadSource.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-    //                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-    //                intent.setType("image/*");
-    //                startActivityForResult(Intent.createChooser(intent, "Open folder"),REQUEST_CODE);
-                    Intent vrIntent = new Intent(MainActivity.this, VRActivity.class);
-                    startActivity(vrIntent);
-                }
-            });
+        assert loadSource != null;
+        loadSource.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "Open folder"),REQUEST_CODE);
+            }
+        });
 
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        assert progressBar != null;
         progressBar.setVisibility(View.INVISIBLE);
 
         final Button loadWifi = (Button) findViewById(R.id.wifi_button);
-        if (loadWifi != null) {
-            loadWifi.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    loadSource.setVisibility(View.INVISIBLE);
-                    loadWifi.setVisibility(View.INVISIBLE);
+        assert loadWifi != null;
+        loadWifi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
+                loadSource.setVisibility(View.INVISIBLE);
+                loadWifi.setVisibility(View.INVISIBLE);
 
-                    EditText ipEdit = (EditText)findViewById(R.id.edit_ip);
-                    StreamLoader loader = new StreamLoader(MainActivity.this, ipEdit.getText().toString(), 1234);
-                    loader.execute();
+                EditText ipEdit = (EditText)findViewById(R.id.edit_ip);
+                assert ipEdit != null;
+                StreamLoader loader = new StreamLoader(MainActivity.this, ipEdit.getText().toString(), 1234);
+                loader.execute();
 
-                    ipEdit.setVisibility(View.INVISIBLE);
-                }
-            });
-        }
+                ipEdit.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

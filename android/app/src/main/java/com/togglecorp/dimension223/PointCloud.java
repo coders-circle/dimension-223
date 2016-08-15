@@ -45,9 +45,11 @@ public class PointCloud {
         mTexture.recycle();
     }
 
-    public void draw(int program, float[] modelViewProjection) {
+    public void draw(int program, float[] modelViewProjection, float[] model) {
         int mvp = GLES20.glGetUniformLocation(program, "mvp");
         GLES20.glUniformMatrix4fv(mvp, 1, false, modelViewProjection, 0);
+        int umodel = GLES20.glGetUniformLocation(program, "model");
+        GLES20.glUniformMatrix4fv(umodel, 1, false, model, 0);
 
         int texture = GLES20.glGetUniformLocation(program, "uTexture");
         GLES20.glUniform1i(texture, 0);
@@ -58,13 +60,19 @@ public class PointCloud {
         vertexBuffer.position(0);
         int position = GLES20.glGetAttribLocation(program, "position");
         GLES20.glVertexAttribPointer(position, 3, GLES20.GL_FLOAT,
-                false, 4*5, vertexBuffer);
+                false, 4*8, vertexBuffer);
         GLES20.glEnableVertexAttribArray(position);
 
         vertexBuffer.position(3);
+        int normal = GLES20.glGetAttribLocation(program, "normal");
+        GLES20.glVertexAttribPointer(normal, 3, GLES20.GL_FLOAT,
+                false, 4*8, vertexBuffer);
+        GLES20.glEnableVertexAttribArray(normal);
+
+        vertexBuffer.position(6);
         int texcoords = GLES20.glGetAttribLocation(program, "texcoords");
         GLES20.glVertexAttribPointer(texcoords, 2, GLES20.GL_FLOAT,
-                false, 4*5, vertexBuffer);
+                false, 4*8, vertexBuffer);
         GLES20.glEnableVertexAttribArray(texcoords);
 
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, mIndices.length, GLES20.GL_UNSIGNED_INT, indexBuffer);

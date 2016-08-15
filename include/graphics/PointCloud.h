@@ -5,10 +5,6 @@
 #include <graphics/Mesh.h>
 #include <graphics/Transformation.h>
 
-// #include <pcl/io/pcd_io.h>
-// #include <pcl/point_types.h>
-// #include <pcl/registration/icp.h>
-
 
 class PointCloud {
 public:
@@ -47,10 +43,6 @@ public:
 
     Transformation transformation;
 
-    // pcl::PointCloud<pcl::PointXYZ>::Ptr getPclCloud() {
-    //     return mPclCloud;
-    // }
-
     std::vector<float>& getVertices() { return mVertices; }
     std::vector<GLuint>& getIndices() { return mIndices; }
 
@@ -65,8 +57,6 @@ private:
     std::vector<GLuint> mIndices;
     GLuint mVbo, mIbo, mVao;
     Texture mTexture;
-
-    // pcl::PointCloud<pcl::PointXYZ>::Ptr mPclCloud;
 
     std::vector<Surface> mSurfaces;
 };

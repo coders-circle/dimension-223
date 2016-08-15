@@ -3,7 +3,6 @@
 
 
 const int MAX_POINTS = 700;
-const int SKIP = 1;
 
 PointCloud::PointCloud(
     const InputData& inputData
@@ -11,7 +10,6 @@ PointCloud::PointCloud(
     : mInputData(inputData),
       mConstructed(false),
       mTexture(mInputData.getImage())
-      // mPclCloud(new pcl::PointCloud<pcl::PointXYZ>)
 {
     mSurfaces.clear();
     reconstruct();
@@ -19,9 +17,8 @@ PointCloud::PointCloud(
 
 
 void PointCloud::reconstruct() {
-    if (mConstructed) {
+    if (mConstructed)
         destroy();
-    }
     else
         mConstructed = true;
 
@@ -30,50 +27,44 @@ void PointCloud::reconstruct() {
     int height = depthMap.rows;
     int width = depthMap.cols;
 
+    // Fill the index buffer.
+    mIndices.resize((width-1)*(height-1)*6);
+    int tmp = 0;
+    for (int i=0; i<height-1; i++) {
+        for (int j=0; j<width-1; j++) {
+            int offset = i*width+j;
+            mIndices[tmp++] = offset;
+            mIndices[tmp++] = offset+1;
+            mIndices[tmp++] = offset+width;
+            mIndices[tmp++] = offset+1;
+            mIndices[tmp++] = offset+1+width;
+            mIndices[tmp++] = offset+width;
+        }
+    }
+
+    // Create the point cloud.
+    mPoints.resize(width*height);
+    mImageCoordinates.resize(width*height);
+
     // Get (x, y) coordinate of the first point.
     float xoffset = float(MAX_POINTS - width)/2.0f / MAX_POINTS;
     float yoffset = float(MAX_POINTS - height)/2.0f / MAX_POINTS;
 
-    // Fill in the point cloud.
-    mVertices.resize(width*height/SKIP/SKIP*5);
-    mPoints.resize(width*height/SKIP/SKIP);
-    mImageCoordinates.resize(width*height/SKIP/SKIP);
-
-    // mPclCloud->width = width/SKIP;
-    // mPclCloud->height = height/SKIP;
-    // mPclCloud->is_dense = false;
-    // mPclCloud->points.resize(mPclCloud->width * mPclCloud->height);
-
-    // float ar = (float)width/(float)height;
-    // float far = mLensBlurImage.getDepthFar();
-    // float near = mLensBlurImage.getDepthNear();
-
-    int tmp = 0;
-    for (int i=0; i<height; i+=SKIP) {
-        for (int j=0; j<width; j+=SKIP) {
+    tmp = 0;
+    for (int i=0; i<height; i++) {
+        for (int j=0; j<width; j++) {
 
             float x = j/(float)MAX_POINTS - 0.5f + xoffset;
             float y = -i/(float)MAX_POINTS + 0.5f - yoffset;
             float depth = depthMap.at<cv::Vec3b>(i, j)[0];
 
             float dd = depth * mInputData.getDepthScale();
-            // depth/5000 * (far*near)/(far - depth/5000 * (far-near));
 
             int index = i*width+j;
 
-            // TODO: Remove mPoints in favor of PclCloud.
             mPoints[index][0] = x * (1-dd);
             mPoints[index][1] = y * (1-dd);
             mPoints[index][2] = dd;
-        }
-    }
-
-    blur(mPoints, width, height);
-
-    for (int i=0; i<height; i+=SKIP) {
-        for (int j=0; j<width; j+=SKIP) {
-
-            int index = i*width+j;
 
             // Check for surface points.
             for (auto& surface: mSurfaces) {
@@ -84,34 +75,47 @@ void PointCloud::reconstruct() {
                         mPoints[index][1] = surface.y;
                 }
             }
-
             mImageCoordinates[index] = glm::ivec2(j, i);
-
-            // mPclCloud->points[index].x = mPoints[index][0];
-            // mPclCloud->points[index].y = mPoints[index][1];
-            // mPclCloud->points[index].z = mPoints[index][2];
-
-
-            mVertices[tmp++] = mPoints[index][0];
-            mVertices[tmp++] = mPoints[index][1];
-            mVertices[tmp++] = mPoints[index][2];
-            mVertices[tmp++] = j/float(width-1);
-            mVertices[tmp++] = i/float(height-1);
         }
     }
 
-    mIndices.resize((width/SKIP-1)*(height/SKIP-1)*6);
-    tmp = 0;
-    for (int i=0; i<height/SKIP-1; i++) {
-        for (int j=0; j<width/SKIP-1; j++) {
-            int offset = i*width+j;
-            mIndices[tmp++] = offset;
-            mIndices[tmp++] = offset+1;
-            mIndices[tmp++] = offset+width;
-            mIndices[tmp++] = offset+1;
-            mIndices[tmp++] = offset+1+width;
-            mIndices[tmp++] = offset+width;
+    blur(mPoints, width, height);
 
+    // Normal estimation.
+    std::vector<glm::vec3> normals(width*height);
+    for (int i=0; i<mIndices.size(); i+=3) {
+        glm::vec3& v0 = mPoints[mIndices[i]];
+        glm::vec3& v1 = mPoints[mIndices[i+1]];
+        glm::vec3& v2 = mPoints[mIndices[i+2]];
+
+        glm::vec3 normal = glm::normalize(
+            glm::cross(v2-v0, v1-v0)
+        );
+        normals[mIndices[i]] += normal;
+        normals[mIndices[i+1]] += normal;
+        normals[mIndices[i+2]] += normal;
+    }
+
+    // Fill vertex buffer.
+    mVertices.resize(width*height*8);
+    for (int i=0; i<height; i++) {
+        for (int j=0; j<width; j++) {
+            int index = i*width+j;
+
+            // Positions.
+            mVertices[tmp++] = mPoints[index][0];
+            mVertices[tmp++] = mPoints[index][1];
+            mVertices[tmp++] = mPoints[index][2];
+
+            // Normals.
+            normals[index] = glm::normalize(normals[index]);
+            mVertices[tmp++] = normals[index].x;
+            mVertices[tmp++] = normals[index].y;
+            mVertices[tmp++] = normals[index].z;
+
+            // Texture coordinates.
+            mVertices[tmp++] = j/float(width-1);
+            mVertices[tmp++] = i/float(height-1);
         }
     }
 
@@ -128,12 +132,17 @@ void PointCloud::reconstruct() {
     glBufferData(GL_ARRAY_BUFFER, mVertices.size()*sizeof(float),
         &mVertices[0], GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat),
         (GLvoid*)0);
-        glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat),
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat),
         (GLvoid*)(3*sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat),
+        (GLvoid*)(6*sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size()*sizeof(GLuint),

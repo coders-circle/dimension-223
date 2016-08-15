@@ -11,7 +11,7 @@ void main()
 {
     color = texture(uTexture, fTexcoords);
 
-    vec3 lightDir = vec3(1, 1, 0);
-    float intensity = max(1.0, 0.2+dot(normalize(fNormal), normalize(lightDir)));
+    vec3 lightDir = vec3(1, 0, 1);
+    float intensity = max(0.0, 0.9+dot(normalize(fNormal), normalize(lightDir)));
     color = color * intensity;
 }

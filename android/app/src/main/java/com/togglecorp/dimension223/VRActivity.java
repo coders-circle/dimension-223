@@ -68,7 +68,7 @@ public class VRActivity extends GvrActivity implements GvrView.StereoRenderer {
         GLES20.glUseProgram(mProgram);
 
         for (PointCloud pc: pointsClouds)
-            pc.draw(mProgram, mModelViewProjection);
+            pc.draw(mProgram, mModelViewProjection, mModelCube);
     }
 
     @Override

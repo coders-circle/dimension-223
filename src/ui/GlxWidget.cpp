@@ -110,8 +110,8 @@ void GlxWidget::on_realize()
         {
             std::cerr << "Failed to retrieve a framebuffer config\n";
         }
-        else
-            std::cout << "Found " << fbcount << " matching FB configs.\n";
+        // else
+        //     std::cout << "Found " << fbcount << " matching FB configs.\n";
 
 
         int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
@@ -123,9 +123,9 @@ void GlxWidget::on_realize()
                 int samp_buf, samples;
                 glXGetFBConfigAttrib(xd, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
                 glXGetFBConfigAttrib(xd, fbc[i], GLX_SAMPLES, &samples);
-                printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
-                    " SAMPLES = %d\n", 
-                    i, (int)vi->visualid, samp_buf, samples );
+                // printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
+                //     " SAMPLES = %d\n", 
+                //     i, (int)vi->visualid, samp_buf, samples );
 
                 if ( best_fbc <= 0 || samp_buf && samples >= best_num_samp )
                     best_fbc = i, best_num_samp = samples;
@@ -142,7 +142,7 @@ void GlxWidget::on_realize()
 
         // Get a visual
         xvi = glXGetVisualFromFBConfig( xd, bestFbc );
-        printf( "Chosen visual ID = 0x%x\n", (int)xvi->visualid );
+        // printf( "Chosen visual ID = 0x%x\n", (int)xvi->visualid );
 
 
         glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
@@ -157,7 +157,7 @@ void GlxWidget::on_realize()
             None
         };
 
-        printf( "Creating context\n" );
+        // printf( "Creating context\n" );
         glxc = glXCreateContextAttribsARB(xd, bestFbc, 0, True, context_attribs);
 
         glXMakeCurrent(
