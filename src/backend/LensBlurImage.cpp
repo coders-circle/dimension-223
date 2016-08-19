@@ -38,6 +38,10 @@ LensBlurImage::LensBlurImage(const std::string& filename)
     cv::subtract(sub_mat, mDepth, temp);
     cv::Size size(550, mDepth.rows/(float)mDepth.cols*550);
     cv::resize(temp, mDepth, size);
+
+    // Postprocessing depthmap.
+    // for (int i=0; i<20; ++i)
+        cv::blur(mDepth, mDepth, cv::Size(9,9), cv::Point(-1,-1));
 }
 
 

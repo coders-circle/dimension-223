@@ -22,6 +22,14 @@ public:
         mSelectionChanged = callback;
     }
 
+    void reset() {
+        mYaw = 90;
+        mPitch = 0;
+        mTarget = glm::vec3(0);
+        mZoom = 1.0f;
+        updateCamera();
+    }
+
 private:
     /// The project database.
     Project& mProject;

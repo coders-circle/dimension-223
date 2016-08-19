@@ -11,6 +11,8 @@
 
 
 bool ProjectStreamer::mListening = false;
+int ProjectStreamer::mSocket;
+std::vector<int> ProjectStreamer::mClients;
 
 
 inline std::vector<char> ReadAllBytes(char const* filename)
@@ -34,12 +36,12 @@ ProjectStreamer::ProjectStreamer(Gtk::Window* parent, Project& project)
     set_transient_for(*parent);
     get_content_area()->add(mHBox);
 
+    if (mListening)
+        mStartBtn.set_label("Stop");
+
     mStartBtn.signal_clicked().connect([&]() {
         if (mListening) {
-            shutdown(mSocket, SHUT_RDWR);
-            ::close(mSocket);
-            mListening = false;
-            mStartBtn.set_label("Start");
+            shutDown();
             return;
         }
 
@@ -82,6 +84,7 @@ ProjectStreamer::ProjectStreamer(Gtk::Window* parent, Project& project)
 
                 std::cout << "One Accepted" << std::endl;
 
+                mClients.push_back(csock);
                 streamProject(csock);
             }
         });
@@ -90,6 +93,20 @@ ProjectStreamer::ProjectStreamer(Gtk::Window* parent, Project& project)
     mHBox.add(mStartBtn);
 
     show_all();
+}
+
+
+void ProjectStreamer::shutDown() {
+    if (mListening) {
+        for (int client: mClients) {
+            ::close(client);
+        }
+
+        shutdown(mSocket, SHUT_RDWR);
+        ::close(mSocket);
+        mListening = false;
+        mStartBtn.set_label("Start");
+    }
 }
 
 
@@ -121,7 +138,11 @@ void ProjectStreamer::streamProject(int client) {
         send(client, &size, sizeof(size), 0);
         std::cout << "Sending " << size << " bytes of texture." << std::endl;
         send(client, &iBytes[0], size, 0);
+
+        // TODO: Send in transformation.
     }
+
+    // TODO: Send models.
 
     std::cout << "Sent all" << std::endl;
 }

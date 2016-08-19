@@ -36,6 +36,10 @@ public:
         mInputHandler.setSelectionChangedCallback(callback);
     }
 
+    void reset() {
+        mInputHandler.reset();
+    }
+
 private:
     GlxWidget& mViewport;
     Project& mProject;

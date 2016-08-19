@@ -5,9 +5,11 @@ void blur(std::vector<glm::vec3>& points, int width, int height)
 {
     cv::Mat image(height, width, CV_32FC3, &points[0][0]);
     // cv::medianBlur(image, image, 5);
-    cv::blur(image, image, cv::Size(9,9), cv::Point(-1,-1));
+    cv::blur(image, image, cv::Size(20,20));
     // cv::GaussianBlur(image, image, cv::Size(9,9), 0);
     // cv::bilateralFilter(output, image, 9, 75, 75);
+
+    // cv::addWeighted(image, 1.5, image, -0.5, 0, image);
 
     for (int i=0; i<height; ++i) {
         for (int j=0; j<width; ++j) {

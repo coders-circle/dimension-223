@@ -13,9 +13,12 @@ private:
     Project& mProject;
     Gtk::Box mHBox;
     Gtk::Button mStartBtn;
+
     static bool mListening;
-    int mSocket;
+    static int mSocket;
+    static std::vector<int> mClients;
+
+    void shutDown();
 
     void streamProject(int client);
-
 };

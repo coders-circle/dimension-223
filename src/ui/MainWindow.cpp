@@ -116,6 +116,7 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
     fileMenu->append(*createMenuItem("_New Project", [this]() {
         mPointCloudList->clear_items();
         mProject.clear();
+        mRenderer.reset();
     }, Accelerator('N', Gdk::ModifierType::CONTROL_MASK, get_accel_group())));
 
     fileMenu->append(*createMenuItem("_Load Project", [this]() {
