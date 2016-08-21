@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
         final Button loadSource = (Button) findViewById(R.id.source_button);
         assert loadSource != null;
+        loadSource.setVisibility(View.INVISIBLE);
+
         loadSource.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,19 +38,32 @@ public class MainActivity extends AppCompatActivity {
 
         final Button loadWifi = (Button) findViewById(R.id.wifi_button);
         assert loadWifi != null;
+
+        final EditText ipEdit = (EditText)findViewById(R.id.edit_ip);
+        assert ipEdit != null;
+
         loadWifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                loadSource.setVisibility(View.INVISIBLE);
                 loadWifi.setVisibility(View.INVISIBLE);
-
-                EditText ipEdit = (EditText)findViewById(R.id.edit_ip);
-                assert ipEdit != null;
-                StreamLoader loader = new StreamLoader(MainActivity.this, ipEdit.getText().toString(), 1234);
-                loader.execute();
-
                 ipEdit.setVisibility(View.INVISIBLE);
+
+                StreamLoader loader = new StreamLoader(ipEdit.getText().toString(), 1234,
+                        new StreamLoader.Listener() {
+                            @Override
+                            public void onComplete(boolean success) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                loadWifi.setVisibility(View.VISIBLE);
+                                ipEdit.setVisibility(View.VISIBLE);
+
+                                if (success) {
+                                    Intent intent = new Intent(MainActivity.this, VRActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        });
+                loader.execute();
             }
         });
     }

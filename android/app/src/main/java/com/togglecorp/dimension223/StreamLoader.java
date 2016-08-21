@@ -14,21 +14,27 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class StreamLoader extends AsyncTask<Void, Void, Void> {
-    private String ip;
-    private int port;
 
-    private Context mContext;
+    public interface Listener {
+        void onComplete(boolean success);
+    }
 
-    public StreamLoader(Context context, String ip, int port) {
-        this.ip = ip;
-        this.port = port;
-        mContext = context;
+    private final String mIp;
+    private final int mPort;
+    private final Listener mListener;
+
+    private boolean mSuccess;
+
+    public StreamLoader(String ip, int port, Listener listener) {
+        mIp = ip;
+        mPort = port;
+        mListener = listener;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            Socket socket = new Socket(ip, port);
+            Socket socket = new Socket(mIp, mPort);
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
 
             byte[] buf_size = new byte[4];
@@ -84,8 +90,10 @@ public class StreamLoader extends AsyncTask<Void, Void, Void> {
             }
 
             socket.close();
+            mSuccess = true;
         } catch (IOException e) {
             e.printStackTrace();
+            mSuccess = false;
         }
 
         return null;
@@ -93,7 +101,6 @@ public class StreamLoader extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
-        Intent intent = new Intent(mContext, VRActivity.class);
-        mContext.startActivity(intent);
+        mListener.onComplete(mSuccess);
     }
 }
