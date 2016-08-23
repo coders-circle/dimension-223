@@ -9,7 +9,7 @@ Renderer::Renderer(GlxWidget& viewport, Project& project)
 
 
 void Renderer::init() {
-    glClearColor(0.396f, 0.612f, 0.937f, 1.0f);
+    glClearColor(0.1803f, 0.1803f,0.1803f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
     mSimpleProgram = new Program(

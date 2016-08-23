@@ -28,8 +28,9 @@ MainWindow::MainWindow(Project& project) :
 
     // Toolbar.
     Gtk::Toolbar* toolbar = Gtk::manage(new Gtk::Toolbar());
-    toolbar->set_property("orientation", Gtk::ORIENTATION_HORIZONTAL);
+    toolbar->set_property("orientation", Gtk::ORIENTATION_VERTICAL);
     toolbar->set_property("toolbar-style", Gtk::TOOLBAR_ICONS);
+    toolbar->set_property("internal-padding",30);
     addToolItems(toolbar);
 
     // Pass viewport event handlers to the renderer.
@@ -54,7 +55,10 @@ MainWindow::MainWindow(Project& project) :
     Gtk::Box* panelLeft = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL, 0));
     hbox->add(*panelLeft);
 
-    panelLeft->add(*Gtk::manage(new Gtk::Label("Point Clouds: ")));
+    Gtk::Label* pointCloudLabel = Gtk::manage(new Gtk::Label("Point Clouds: "));
+    pointCloudLabel->set_padding(10,10);
+
+    panelLeft->add(*pointCloudLabel);
     mPointCloudList = Gtk::manage(new Gtk::ListViewText(1));
     mPointCloudList->set_size_request(200, 300);
     mPointCloudList->get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
@@ -89,6 +93,7 @@ MainWindow::MainWindow(Project& project) :
         }
     });
     panelLeft->add(*stitchBtn);
+    panelLeft->add(*toolbar);
 
     // Show and add the viewport to the window.
     mViewport.show();
@@ -96,7 +101,6 @@ MainWindow::MainWindow(Project& project) :
     mViewport.set_vexpand(true);
     hbox->add(mViewport);
 
-    vbox->add(*toolbar);
 
     vbox->show_all();
 
@@ -155,7 +159,7 @@ void MainWindow::addMenuItems(Gtk::MenuBar* menuBar) {
 void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
     // Gtk::ToolButton *TB1 = new Gtk::ToolButton(Gtk::Stock::GO_BACK);
     // toolbar->append(*TB1);
-
+    toolbar->append(*Gtk::manage(new Gtk::SeparatorToolItem()));
     toolbar->append(*createToolItem(
         Gtk::manage(new Gtk::Label("Translation: ")))
     );
@@ -198,7 +202,7 @@ void MainWindow::addToolItems(Gtk::Toolbar* toolbar) {
     mDynamicButton->signal_toggled().connect([this]() {
         updateSelection();
     });
-    toolbar->append(*createToolItem(mDynamicButton));
+    //toolbar->append(*createToolItem(mDynamicButton));
 }
 
 void MainWindow::setTransformation(Transformation& t) {

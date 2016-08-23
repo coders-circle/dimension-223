@@ -28,7 +28,7 @@ InputDialog::InputDialog(
     mDepthView = Gtk::manage(new Gtk::Image());
 
     mGrid.attach(*mImageView, 0, 0, 4, 4);
-    mGrid.attach(*mDepthView, 5, 0, 4, 4);
+    mGrid.attach(*mDepthView, 6, 0, 4, 4);
 
     Gtk::Button* imgBtn = Gtk::manage(new Gtk::Button("Browse"));
     Gtk::Button* depthBtn = Gtk::manage(new Gtk::Button("Browse"));
@@ -50,13 +50,13 @@ InputDialog::InputDialog(
     });
 
 
-    mGrid.attach(*imgBtn, 0, 5, 1, 1);
-    mGrid.attach(*depthBtn, 5, 5, 1, 1);
+    mGrid.attach(*imgBtn, 3, 5, 2, 1);
+    mGrid.attach(*depthBtn, 9, 5, 2, 1);
 
     Gtk::Button* lbBtn = Gtk::manage(
         new Gtk::Button("Add from lens blur")
     );
-    mGrid.attach(*lbBtn, 0, 6, 2, 2);
+    mGrid.attach(*lbBtn, 6, 6, 2, 2);
 
     lbBtn->signal_clicked().connect([this]() {
         std::string file = openFileDialog(*this,
@@ -69,7 +69,7 @@ InputDialog::InputDialog(
             setViewImage(mImageView, mImage);
             setViewImage(mDepthView, mDepthMap);
         }
-        
+
     });
 
     Gtk::Button* cancelBtn = Gtk::manage(new Gtk::Button("Cancel"));
